@@ -1,0 +1,222 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
+    "version": "1.0.0",
+    "title": "Challenges",
+    "contact": {
+      "name": "Robert",
+      "email": "rdm10@aber.ac.uk"
+    }
+  },
+  "tags": [
+    {
+      "name": "Challenges",
+      "description": "Challenges CRUD operations."
+    }
+  ],
+  "paths": {
+    "/challenge": {
+      "post": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Add a new challenge for a user.",
+        "operationId": "addChallenge",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "challengeObject",
+            "description": "challenge object to be added.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Challenge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "$ref": "#/definitions/Challenge"
+            }
+          },
+          "405": {
+            "description": "Invalid input."
+          }
+        }
+      }
+    },
+    "/challenge/getUserChallenges/{UUID}": {
+      "get": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Get list of user challenges.",
+        "operationId": "getUserChallenges",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "UUID",
+            "in": "path",
+            "description": "UserId to retrieve challenges for.",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Challenge"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UUID supplied."
+          },
+          "404": {
+            "description": "User not found."
+          }
+        }
+      }
+    },
+    "/challenge/{ChallengeId}": {
+      "put": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Update an existing Challenge.",
+        "operationId": "updateChallenge",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "ChallengeId",
+            "in": "path",
+            "description": "ID of Challenge to update.",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "ChallengeObject",
+            "description": "Challenge object to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Challenge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation."
+          },
+          "400": {
+            "description": "Invalid ID supplied."
+          },
+          "404": {
+            "description": "Challenge not found."
+          },
+          "405": {
+            "description": "Invalid input."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Deletes a challenge.",
+        "operationId": "deleteChallenge",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "ChallengeId",
+            "in": "path",
+            "description": "ID of challenge to be deleted.",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation."
+          },
+          "400": {
+            "description": "Invalid ID supplied."
+          },
+          "404": {
+            "description": "Challenge not found."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Challenge": {
+      "type": "object",
+      "required": [
+        "challengeId",
+        "startDateTime",
+        "endDateTime",
+        "activityId",
+        "goal",
+        "repeat",
+        "userId"
+      ],
+      "properties": {
+        "challengeId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "startDateTime": {
+          "type": "string",
+          "example": "2018/07/16 09:00:00"
+        },
+        "endDateTime": {
+          "type": "string",
+          "example": "2018/07/16 09:00:00"
+        },
+        "activityId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "goal": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "repeat": {
+          "type": "boolean"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "GitHub Repository",
+    "url": "https://github.com/sem5640-2018/challenges"
+  }
+}
