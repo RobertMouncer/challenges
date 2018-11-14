@@ -11,11 +11,62 @@
   },
   "tags": [
     {
+      "name": "Status",
+      "description": "Returns Status of microservice."
+    },
+    {
+      "name": "Activities",
+      "description": "CRUD operations for activities."
+    },
+    {
       "name": "Challenges",
       "description": "Challenges CRUD operations."
     }
   ],
   "paths": {
+    "/status": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Check status of the microservice.",
+        "operationId": "checkStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation."
+          }
+        }
+      }
+    },
+    "/activities": {
+      "get": {
+        "tags": [
+          "Activities"
+        ],
+        "summary": "Returns list of available activites.",
+        "operationId": "getActivities",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Activity"
+              }
+            }
+          }
+        }
+      }
+    },
     "/challenge": {
       "post": {
         "tags": [
@@ -181,6 +232,7 @@
         "endDateTime",
         "activityId",
         "goal",
+        "goalMetric",
         "repeat",
         "userId"
       ],
@@ -197,9 +249,8 @@
           "type": "string",
           "example": "2018/07/16 09:00:00"
         },
-        "activityId": {
-          "type": "integer",
-          "format": "int64"
+        "activity": {
+          "$ref": "#/definitions/Activity"
         },
         "goal": {
           "type": "integer",
@@ -211,6 +262,28 @@
         "userId": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "Activity": {
+      "type": "object",
+      "required": [
+        "activityId",
+        "activityName",
+        "goalMetric"
+      ],
+      "properties": {
+        "activityId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "activityName": {
+          "type": "string",
+          "example": "Swimming"
+        },
+        "goalMetric": {
+          "type": "string",
+          "example": "Seconds"
         }
       }
     }
