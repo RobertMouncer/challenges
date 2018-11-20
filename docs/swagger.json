@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "title": "Challenges",
     "contact": {
       "name": "Robert",
@@ -104,7 +104,7 @@
         }
       }
     },
-    "/challenge/getUserChallenges/{UUID}": {
+    "/challenge/find/{UUID}": {
       "get": {
         "tags": [
           "Challenges"
@@ -234,7 +234,7 @@
         "goal",
         "goalMetric",
         "repeat",
-        "userId"
+        "userGroup"
       ],
       "properties": {
         "challengeId": {
@@ -259,9 +259,8 @@
         "repeat": {
           "type": "boolean"
         },
-        "userId": {
-          "type": "integer",
-          "format": "int64"
+        "userGroup": {
+          "$ref": "#/definitions/UserGroup"
         }
       }
     },
@@ -286,6 +285,9 @@
           "example": "Seconds"
         }
       }
+    },
+    "UserGroup": {
+      "type": "object"
     }
   },
   "externalDocs": {
