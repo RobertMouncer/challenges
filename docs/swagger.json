@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "title": "Challenges",
     "contact": {
       "name": "Robert",
@@ -109,7 +109,7 @@
         "tags": [
           "Challenges"
         ],
-        "summary": "Get list of user challenges.",
+        "summary": "Get list of userGroup challenges.",
         "operationId": "getUserChallenges",
         "produces": [
           "application/json"
@@ -118,7 +118,7 @@
           {
             "name": "UUID",
             "in": "path",
-            "description": "UserId to retrieve challenges for.",
+            "description": "UserGroupId to retrieve challenges for.",
             "required": true,
             "type": "integer",
             "format": "int64"
@@ -138,7 +138,7 @@
             "description": "Invalid UUID supplied."
           },
           "404": {
-            "description": "User not found."
+            "description": "UserGroup not found."
           }
         }
       }
@@ -234,7 +234,8 @@
         "goal",
         "goalMetric",
         "repeat",
-        "userGroup"
+        "userGroup",
+        "percentageComplete"
       ],
       "properties": {
         "challengeId": {
@@ -253,6 +254,10 @@
           "$ref": "#/definitions/Activity"
         },
         "goal": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "percentageComplete": {
           "type": "integer",
           "format": "int64"
         },
@@ -287,7 +292,28 @@
       }
     },
     "UserGroup": {
-      "type": "object"
+      "type": "object",
+      "required": [
+        "userGroupId"
+      ],
+      "properties": {
+        "userGroupId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "GroupId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "isGroup": {
+          "type": "boolean",
+          "example": true
+        }
+      }
     }
   },
   "externalDocs": {
