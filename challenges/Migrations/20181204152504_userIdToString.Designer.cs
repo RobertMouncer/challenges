@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using challenges.Models;
 
 namespace challenges.Migrations
 {
     [DbContext(typeof(challengesContext))]
-    partial class challengesContextModelSnapshot : ModelSnapshot
+    [Migration("20181204152504_userIdToString")]
+    partial class userIdToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

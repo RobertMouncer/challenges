@@ -11,7 +11,7 @@ namespace challenges.Models
         [Required]
         public virtual int UserGroupId { get; set; }
 
-        public virtual int UserId { get; set; }
+        public virtual string UserId { get; set; }
 
         public virtual int GroupId { get; set; }
         public virtual bool isGroup{ get; set; }
