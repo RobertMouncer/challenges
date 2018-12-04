@@ -63,6 +63,9 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,PercentageComplete,Repeat,ActivityId,UserGroupId")] Challenge challenge)
         {
+            if(DateTime.Compare(challenge.StartDateTime, DateTime.Now()) <= 0){
+
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(challenge);

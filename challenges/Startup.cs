@@ -99,7 +99,7 @@ namespace challenges
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Activities}/{action=Index}/{id?}");
+                    template: "{controller=Challenges}/{action=Index}/{id?}");
             });
         }
     }
