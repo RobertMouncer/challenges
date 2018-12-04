@@ -13,13 +13,25 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.UserId)
+                @Html.DisplayNameFor(model => model.Challenge.Activity.ActivityName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Challenge)
+                @Html.DisplayNameFor(model => model.Challenge.StartDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.EndDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.Goal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.Activity.GoalMetric)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PercentageComplete)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.isGroupChallenge)
             </th>
             <th></th>
         </tr>
@@ -28,13 +40,25 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.UserId)
+                @Html.DisplayFor(modelItem => item.Challenge.Activity.ActivityName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Challenge.ChallengeId)
+                @Html.DisplayFor(modelItem => item.Challenge.StartDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.EndDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.Goal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.Activity.GoalMetric)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PercentageComplete)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.isGroupChallenge)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.UserChallengeId">Edit</a> |
