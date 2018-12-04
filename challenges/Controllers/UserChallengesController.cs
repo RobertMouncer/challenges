@@ -23,7 +23,8 @@ namespace challenges.Controllers
         // GET: UserChallenges
         public async Task<IActionResult> Index()
         {
-            var challengesContext = _context.UserChallenge.Include(u => u.Challenge);
+            var challengesContext = _context.UserChallenge.Include(u => u.Challenge).Include(a => a.Challenge.Activity);
+
             return View(await challengesContext.ToListAsync());
         }
 
