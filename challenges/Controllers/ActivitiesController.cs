@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace challenges.Controllers
 {
+    [Authorize(AuthenticationSchemes = "oidc", Policy = "Administrator")]
     public class ActivitiesController : Controller
     {
         private readonly challengesContext _context;
