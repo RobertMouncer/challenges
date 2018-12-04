@@ -1,0 +1,47 @@
+﻿@model IEnumerable<challenges.Models.UserGroup>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GroupId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.isGroup)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GroupId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.isGroup)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.UserGroupId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.UserGroupId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.UserGroupId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
