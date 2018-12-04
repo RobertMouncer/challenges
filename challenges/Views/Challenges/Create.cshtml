@@ -28,11 +28,6 @@
                 <span asp-validation-for="Goal" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PercentageComplete" class="control-label"></label>
-                <input asp-for="PercentageComplete" class="form-control" />
-                <span asp-validation-for="PercentageComplete" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <div class="checkbox">
                     <label>
                         <input asp-for="Repeat" /> @Html.DisplayNameFor(model => model.Repeat)
@@ -44,8 +39,16 @@
                 <select asp-for="ActivityId" class ="form-control" asp-items="ViewBag.ActivityId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="UserGroupId" class="control-label"></label>
-                <select asp-for="UserGroupId" class ="form-control" asp-items="ViewBag.UserGroupId"></select>
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="isGroupChallenge" /> @Html.DisplayNameFor(model => model.isGroupChallenge)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Groupid" class="control-label"></label>
+                <input asp-for="Groupid" class="form-control" />
+                <span asp-validation-for="Groupid" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />

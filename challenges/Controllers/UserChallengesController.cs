@@ -2,30 +2,30 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using challenges.Models;
 
-namespace challenges.Models
+namespace challenges.Controllers
 {
-    [Authorize(AuthenticationSchemes = "oidc", Policy = "Administrator")]
-    public class UserGroupsController : Controller
+    public class UserChallengesController : Controller
     {
         private readonly challengesContext _context;
 
-        public UserGroupsController(challengesContext context)
+        public UserChallengesController(challengesContext context)
         {
             _context = context;
         }
 
-        // GET: UserGroups
+        // GET: UserChallenges
         public async Task<IActionResult> Index()
         {
-            return View(await _context.UserGroup.ToListAsync());
+            var challengesContext = _context.UserChallenge.Include(u => u.Challenge);
+            return View(await challengesContext.ToListAsync());
         }
 
-        // GET: UserGroups/Details/5
+        // GET: UserChallenges/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,42 @@ namespace challenges.Models
                 return NotFound();
             }
 
-            var userGroup = await _context.UserGroup
-                .FirstOrDefaultAsync(m => m.UserGroupId == id);
-            if (userGroup == null)
+            var userChallenge = await _context.UserChallenge
+                .Include(u => u.Challenge)
+                .FirstOrDefaultAsync(m => m.UserChallengeId == id);
+            if (userChallenge == null)
             {
                 return NotFound();
             }
 
-            return View(userGroup);
+            return View(userChallenge);
         }
 
-        // GET: UserGroups/Create
+        // GET: UserChallenges/Create
         public IActionResult Create()
         {
+            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId");
             return View();
         }
 
-        // POST: UserGroups/Create
+        // POST: UserChallenges/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserGroupId,UserId,GroupId,isGroup")] UserGroup userGroup)
+        public async Task<IActionResult> Create([Bind("UserChallengeId,UserId,ChallengeId,PercentageComplete")] UserChallenge userChallenge)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(userGroup);
+                _context.Add(userChallenge);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(userGroup);
+            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
+            return View(userChallenge);
         }
 
-        // GET: UserGroups/Edit/5
+        // GET: UserChallenges/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +76,23 @@ namespace challenges.Models
                 return NotFound();
             }
 
-            var userGroup = await _context.UserGroup.FindAsync(id);
-            if (userGroup == null)
+            var userChallenge = await _context.UserChallenge.FindAsync(id);
+            if (userChallenge == null)
             {
                 return NotFound();
             }
-            return View(userGroup);
+            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
+            return View(userChallenge);
         }
 
-        // POST: UserGroups/Edit/5
+        // POST: UserChallenges/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserGroupId,UserId,GroupId,isGroup")] UserGroup userGroup)
+        public async Task<IActionResult> Edit(int id, [Bind("UserChallengeId,UserId,ChallengeId,PercentageComplete")] UserChallenge userChallenge)
         {
-            if (id != userGroup.UserGroupId)
+            if (id != userChallenge.UserChallengeId)
             {
                 return NotFound();
             }
@@ -97,12 +101,12 @@ namespace challenges.Models
             {
                 try
                 {
-                    _context.Update(userGroup);
+                    _context.Update(userChallenge);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserGroupExists(userGroup.UserGroupId))
+                    if (!UserChallengeExists(userChallenge.UserChallengeId))
                     {
                         return NotFound();
                     }
@@ -113,10 +117,11 @@ namespace challenges.Models
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(userGroup);
+            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
+            return View(userChallenge);
         }
 
-        // GET: UserGroups/Delete/5
+        // GET: UserChallenges/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,30 +129,31 @@ namespace challenges.Models
                 return NotFound();
             }
 
-            var userGroup = await _context.UserGroup
-                .FirstOrDefaultAsync(m => m.UserGroupId == id);
-            if (userGroup == null)
+            var userChallenge = await _context.UserChallenge
+                .Include(u => u.Challenge)
+                .FirstOrDefaultAsync(m => m.UserChallengeId == id);
+            if (userChallenge == null)
             {
                 return NotFound();
             }
 
-            return View(userGroup);
+            return View(userChallenge);
         }
 
-        // POST: UserGroups/Delete/5
+        // POST: UserChallenges/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userGroup = await _context.UserGroup.FindAsync(id);
-            _context.UserGroup.Remove(userGroup);
+            var userChallenge = await _context.UserChallenge.FindAsync(id);
+            _context.UserChallenge.Remove(userChallenge);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserGroupExists(int id)
+        private bool UserChallengeExists(int id)
         {
-            return _context.UserGroup.Any(e => e.UserGroupId == id);
+            return _context.UserChallenge.Any(e => e.UserChallengeId == id);
         }
     }
 }

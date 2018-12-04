@@ -1,4 +1,4 @@
-﻿@model IEnumerable<challenges.Models.UserGroup>
+﻿@model IEnumerable<challenges.Models.UserChallenge>
 
 @{
     ViewData["Title"] = "Index";
@@ -16,10 +16,10 @@
                 @Html.DisplayNameFor(model => model.UserId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.GroupId)
+                @Html.DisplayNameFor(model => model.Challenge)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.isGroup)
+                @Html.DisplayNameFor(model => model.PercentageComplete)
             </th>
             <th></th>
         </tr>
@@ -31,15 +31,15 @@
                 @Html.DisplayFor(modelItem => item.UserId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.GroupId)
+                @Html.DisplayFor(modelItem => item.Challenge.ChallengeId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.isGroup)
+                @Html.DisplayFor(modelItem => item.PercentageComplete)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.UserGroupId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UserGroupId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserGroupId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.UserChallengeId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.UserChallengeId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.UserChallengeId">Delete</a>
             </td>
         </tr>
 }

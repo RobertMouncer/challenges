@@ -22,16 +22,16 @@
                 @Html.DisplayNameFor(model => model.Goal)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PercentageComplete)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Repeat)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Activity)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserGroup)
+                @Html.DisplayNameFor(model => model.isGroupChallenge)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Groupid)
             </th>
             <th></th>
         </tr>
@@ -49,16 +49,16 @@
                 @Html.DisplayFor(modelItem => item.Goal)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PercentageComplete)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Repeat)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Activity.ActivityName)
+                @Html.DisplayFor(modelItem => item.Activity.ActivityId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UserGroup.UserGroupId)
+                @Html.DisplayFor(modelItem => item.isGroupChallenge)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Groupid)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ChallengeId">Edit</a> |

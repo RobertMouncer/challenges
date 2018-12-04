@@ -1,4 +1,4 @@
-﻿@model challenges.Models.UserGroup
+﻿@model challenges.Models.UserChallenge
 
 @{
     ViewData["Title"] = "Delete";
@@ -8,7 +8,7 @@
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>UserGroup</h4>
+    <h4>UserChallenge</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -18,21 +18,21 @@
             @Html.DisplayFor(model => model.UserId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.GroupId)
+            @Html.DisplayNameFor(model => model.Challenge)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.GroupId)
+            @Html.DisplayFor(model => model.Challenge.ChallengeId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.isGroup)
+            @Html.DisplayNameFor(model => model.PercentageComplete)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.isGroup)
+            @Html.DisplayFor(model => model.PercentageComplete)
         </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="UserGroupId" />
+        <input type="hidden" asp-for="UserChallengeId" />
         <input type="submit" value="Delete" class="btn btn-default" /> |
         <a asp-action="Index">Back to List</a>
     </form>

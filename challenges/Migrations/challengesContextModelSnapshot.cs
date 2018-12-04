@@ -22,11 +22,9 @@ namespace challenges.Migrations
                     b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ActivityName")
-                        .IsRequired();
+                    b.Property<string>("ActivityName");
 
-                    b.Property<string>("GoalMetric")
-                        .IsRequired();
+                    b.Property<string>("GoalMetric");
 
                     b.HasKey("ActivityId");
 
@@ -44,37 +42,37 @@ namespace challenges.Migrations
 
                     b.Property<int>("Goal");
 
-                    b.Property<int>("PercentageComplete");
+                    b.Property<string>("Groupid");
 
                     b.Property<bool>("Repeat");
 
                     b.Property<DateTime>("StartDateTime");
 
-                    b.Property<int>("UserGroupId");
+                    b.Property<bool>("isGroupChallenge");
 
                     b.HasKey("ChallengeId");
 
                     b.HasIndex("ActivityId");
 
-                    b.HasIndex("UserGroupId");
-
                     b.ToTable("Challenge");
                 });
 
-            modelBuilder.Entity("challenges.Models.UserGroup", b =>
+            modelBuilder.Entity("challenges.Models.UserChallenge", b =>
                 {
-                    b.Property<int>("UserGroupId")
+                    b.Property<int>("UserChallengeId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("ChallengeId");
+
+                    b.Property<int>("PercentageComplete");
 
                     b.Property<string>("UserId");
 
-                    b.Property<bool>("isGroup");
+                    b.HasKey("UserChallengeId");
 
-                    b.HasKey("UserGroupId");
+                    b.HasIndex("ChallengeId");
 
-                    b.ToTable("UserGroup");
+                    b.ToTable("UserChallenge");
                 });
 
             modelBuilder.Entity("challenges.Models.Challenge", b =>
@@ -83,10 +81,13 @@ namespace challenges.Migrations
                         .WithMany()
                         .HasForeignKey("ActivityId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
 
-                    b.HasOne("challenges.Models.UserGroup", "UserGroup")
+            modelBuilder.Entity("challenges.Models.UserChallenge", b =>
+                {
+                    b.HasOne("challenges.Models.Challenge", "Challenge")
                         .WithMany()
-                        .HasForeignKey("UserGroupId")
+                        .HasForeignKey("ChallengeId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

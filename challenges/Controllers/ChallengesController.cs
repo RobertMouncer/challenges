@@ -6,12 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace challenges.Controllers
 {
-    [Authorize(AuthenticationSchemes = "oidc")]
-
     public class ChallengesController : Controller
     {
         private readonly challengesContext _context;
@@ -24,7 +21,7 @@ namespace challenges.Controllers
         // GET: Challenges
         public async Task<IActionResult> Index()
         {
-            var challengesContext = _context.Challenge.Include(c => c.Activity).Include(c => c.UserGroup);
+            var challengesContext = _context.Challenge.Include(c => c.Activity);
             return View(await challengesContext.ToListAsync());
         }
 
@@ -38,7 +35,6 @@ namespace challenges.Controllers
 
             var challenge = await _context.Challenge
                 .Include(c => c.Activity)
-                .Include(c => c.UserGroup)
                 .FirstOrDefaultAsync(m => m.ChallengeId == id);
             if (challenge == null)
             {
@@ -51,8 +47,7 @@ namespace challenges.Controllers
         // GET: Challenges/Create
         public IActionResult Create()
         {
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
-            ViewData["UserGroupId"] = new SelectList(_context.UserGroup, "UserGroupId", "UserGroupId");
+            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityId");
             return View();
         }
 
@@ -61,19 +56,15 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,PercentageComplete,Repeat,ActivityId,UserGroupId")] Challenge challenge)
+        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
         {
-            if(DateTime.Compare(challenge.StartDateTime, DateTime.Now()) <= 0){
-
-            }
             if (ModelState.IsValid)
             {
                 _context.Add(challenge);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName", challenge.ActivityId);
-            ViewData["UserGroupId"] = new SelectList(_context.UserGroup, "UserGroupId", "UserGroupId", challenge.UserGroupId);
+            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityId", challenge.ActivityId);
             return View(challenge);
         }
 
@@ -90,8 +81,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName", challenge.ActivityId);
-            ViewData["UserGroupId"] = new SelectList(_context.UserGroup, "UserGroupId", "UserGroupId", challenge.UserGroupId);
+            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityId", challenge.ActivityId);
             return View(challenge);
         }
 
@@ -100,7 +90,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,PercentageComplete,Repeat,ActivityId,UserGroupId")] Challenge challenge)
+        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
         {
             if (id != challenge.ChallengeId)
             {
@@ -127,8 +117,7 @@ namespace challenges.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName", challenge.ActivityId);
-            ViewData["UserGroupId"] = new SelectList(_context.UserGroup, "UserGroupId", "UserGroupId", challenge.UserGroupId);
+            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityId", challenge.ActivityId);
             return View(challenge);
         }
 
@@ -142,7 +131,6 @@ namespace challenges.Controllers
 
             var challenge = await _context.Challenge
                 .Include(c => c.Activity)
-                .Include(c => c.UserGroup)
                 .FirstOrDefaultAsync(m => m.ChallengeId == id);
             if (challenge == null)
             {

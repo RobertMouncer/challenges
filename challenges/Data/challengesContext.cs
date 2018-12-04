@@ -14,10 +14,10 @@ namespace challenges.Models
         {
         }
 
-        public DbSet<challenges.Models.UserGroup> UserGroup { get; set; }
-
         public DbSet<challenges.Models.Activity> Activity { get; set; }
 
         public DbSet<challenges.Models.Challenge> Challenge { get; set; }
+
+        public DbSet<challenges.Models.UserChallenge> UserChallenge { get; set; }
     }
 }

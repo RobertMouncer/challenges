@@ -1,4 +1,4 @@
-﻿@model challenges.Models.UserGroup
+﻿@model challenges.Models.UserChallenge
 
 @{
     ViewData["Title"] = "Create";
@@ -6,7 +6,7 @@
 
 <h2>Create</h2>
 
-<h4>UserGroup</h4>
+<h4>UserChallenge</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -18,16 +18,13 @@
                 <span asp-validation-for="UserId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="GroupId" class="control-label"></label>
-                <input asp-for="GroupId" class="form-control" />
-                <span asp-validation-for="GroupId" class="text-danger"></span>
+                <label asp-for="ChallengeId" class="control-label"></label>
+                <select asp-for="ChallengeId" class ="form-control" asp-items="ViewBag.ChallengeId"></select>
             </div>
             <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="isGroup" /> @Html.DisplayNameFor(model => model.isGroup)
-                    </label>
-                </div>
+                <label asp-for="PercentageComplete" class="control-label"></label>
+                <input asp-for="PercentageComplete" class="form-control" />
+                <span asp-validation-for="PercentageComplete" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />

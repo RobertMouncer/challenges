@@ -29,12 +29,6 @@
             @Html.DisplayFor(model => model.Goal)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.PercentageComplete)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.PercentageComplete)
-        </dd>
-        <dt>
             @Html.DisplayNameFor(model => model.Repeat)
         </dt>
         <dd>
@@ -44,13 +38,19 @@
             @Html.DisplayNameFor(model => model.Activity)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Activity.ActivityName)
+            @Html.DisplayFor(model => model.Activity.ActivityId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.UserGroup)
+            @Html.DisplayNameFor(model => model.isGroupChallenge)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.UserGroup.UserGroupId)
+            @Html.DisplayFor(model => model.isGroupChallenge)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Groupid)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Groupid)
         </dd>
     </dl>
 </div>

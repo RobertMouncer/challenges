@@ -38,8 +38,7 @@ namespace challenges
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<challengesContext>(options =>
-                    options.UseMySql(Configuration.GetConnectionString("challengesContext")));
+
             var appConfig = Configuration.GetSection("challenges");
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -74,6 +73,9 @@ namespace challenges
                 // Coordinator policy allows both Coordinators and Administrators
                 options.AddPolicy("Coordinator", pb => pb.RequireClaim("user_type", new[] { "administrator", "coordinator" }));
             });
+
+            services.AddDbContext<challengesContext>(options =>
+                    options.UseMySql(Configuration.GetConnectionString("challengesContext")));
         }
 
 
