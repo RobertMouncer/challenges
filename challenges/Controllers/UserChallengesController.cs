@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using Microsoft.AspNetCore.Authorization;
-
+//display all user challenges.
 namespace challenges.Controllers
 {
     [Authorize(AuthenticationSchemes = "oidc")]
@@ -23,7 +23,20 @@ namespace challenges.Controllers
         // GET: UserChallenges
         public async Task<IActionResult> Index()
         {
-            var challengesContext = _context.UserChallenge.Include(u => u.Challenge).Include(a => a.Challenge.Activity);
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+            IQueryable<UserChallenge> challengesContext;
+
+            if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
+            {
+                 challengesContext = _context.UserChallenge.Include(u => u.Challenge)
+                                                                           .Include(a => a.Challenge.Activity)
+                                                                           .Where(c => c.UserId.Equals(userId));
+            } else
+            {
+                challengesContext = _context.UserChallenge.Include(u => u.Challenge)
+                                                           .Include(a => a.Challenge.Activity)
+                                                           .Where(c => c.UserId.Equals(userId));
+            }
 
             return View(await challengesContext.ToListAsync());
         }

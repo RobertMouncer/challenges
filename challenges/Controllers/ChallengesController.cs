@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using Microsoft.AspNetCore.Authorization;
-
+//Index page will be used to display group challenges that users can join. The create function will be used by the userChallenge to create a challenge for the user.
 namespace challenges.Controllers
 {
     [Authorize(AuthenticationSchemes = "oidc")]
@@ -23,8 +23,10 @@ namespace challenges.Controllers
         // GET: Challenges
         public async Task<IActionResult> Index()
         {
-            var challengesContext = _context.Challenge.Include(c => c.Activity);
-            return View(await challengesContext.ToListAsync());
+
+            var challengesContext = await _context.Challenge.Include(c => c.Activity).ToListAsync();
+
+            return View(challengesContext);
         }
 
         // GET: Challenges/Details/5
@@ -60,13 +62,26 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+
+            UserChallenge userBoi = new UserChallenge
+            {
+                UserId = userId,
+                Challenge = challenge,
+                ChallengeId = challenge.ChallengeId
+            };
+
             if (ModelState.IsValid)
             {
+                
                 _context.Add(challenge);
+                if (!challenge.isGroupChallenge)
+                {
+                    _context.Add(userBoi);
+                }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("UserChallenge", "Index");
             }
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityId", challenge.ActivityId);
             return View(challenge);
         }
 

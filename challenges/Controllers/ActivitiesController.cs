@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using Microsoft.AspNetCore.Authorization;
 
+
+//simply store info about an activity. Nice and easy.
 namespace challenges.Controllers
 {
     [Authorize(AuthenticationSchemes = "oidc", Policy = "Administrator")]
