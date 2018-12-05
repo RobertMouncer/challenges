@@ -23,10 +23,19 @@ namespace challenges.Controllers
         // GET: Challenges
         public async Task<IActionResult> Index()
         {
+            IQueryable<Challenge> challengesContext;
+            if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
+            {
+                challengesContext =  _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+            }
+            else
+            {
+                //TODO get user group and only display for that group
+                challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+            }
+            
 
-            var challengesContext = await _context.Challenge.Include(c => c.Activity).ToListAsync();
-
-            return View(challengesContext);
+            return View(await challengesContext.ToListAsync());
         }
 
         // GET: Challenges/Details/5
@@ -63,8 +72,11 @@ namespace challenges.Controllers
         public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
-
-            UserChallenge userBoi = new UserChallenge
+            if(challenge.Groupid != null)
+            {
+                challenge.isGroupChallenge = true;
+            }
+            UserChallenge user = new UserChallenge
             {
                 UserId = userId,
                 Challenge = challenge,
@@ -77,10 +89,10 @@ namespace challenges.Controllers
                 _context.Add(challenge);
                 if (!challenge.isGroupChallenge)
                 {
-                    _context.Add(userBoi);
+                    _context.Add(user);
                 }
                 await _context.SaveChangesAsync();
-                return RedirectToAction("UserChallenge", "Index");
+                return RedirectToAction("Index", "UserChallenges");
             }
             return View(challenge);
         }
@@ -171,6 +183,23 @@ namespace challenges.Controllers
         private bool ChallengeExists(int id)
         {
             return _context.Challenge.Any(e => e.ChallengeId == id);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Join(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var group = await groupRepository.GetByIdAsync(id.Value);
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            return View(group);
         }
     }
 }

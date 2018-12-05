@@ -61,9 +61,20 @@
                 @Html.DisplayFor(modelItem => item.Groupid)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ChallengeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ChallengeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ChallengeId">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.ChallengeId">Details</a>
+                @if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
+                {
+                    @:|
+                    <a asp-action="Edit" asp-route-id="@item.ChallengeId">Edit</a>
+                    @:|
+                    <a asp-action="Delete" asp-route-id="@item.ChallengeId">Delete</a>
+                }
+                else
+                {
+                    @:|
+                    <a asp-action="Join" asp-route-id="@item.ChallengeId">Join</a>
+                }
+                        
             </td>
         </tr>
 }

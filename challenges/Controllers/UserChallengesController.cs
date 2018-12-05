@@ -26,7 +26,7 @@ namespace challenges.Controllers
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
             IQueryable<UserChallenge> challengesContext;
 
-            if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
+            if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
             {
                  challengesContext = _context.UserChallenge.Include(u => u.Challenge)
                                                                            .Include(a => a.Challenge.Activity)
