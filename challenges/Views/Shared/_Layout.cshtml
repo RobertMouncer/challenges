@@ -1,4 +1,11 @@
 ﻿<!DOCTYPE html>
+@{
+    ViewData["Title"] = "Index";
+    var userId = User.Claims.Single(c => c.Type == "sub").Value;
+    var isAdminOrCoordinator = User.HasClaim("user_type", "administrator") || User.HasClaim("user_type", "coordinator");
+
+}
+
 <html>
 <head>
     <meta charset="utf-8" />
@@ -30,9 +37,23 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a asp-area="" asp-controller="Activities" asp-action="Index">Activity</a></li>
+                    <li><a asp-area="" asp-controller="UserChallenges" asp-action="Index">Your Challenges</a></li>
+
+                    <li>
+                        <a asp-area="" asp-controller="Challenges" asp-action="Index">
+                            @if (isAdminOrCoordinator)
+                            {
+                                @: Create a group challenge
+                            }
+                            else
+                            {
+                                @: Join a group challenge
+                            }
+
+
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

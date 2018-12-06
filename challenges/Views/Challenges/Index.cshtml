@@ -1,0 +1,88 @@
+﻿@model IEnumerable<challenges.Models.Challenge>
+
+@{
+    ViewData["Title"] = "Index";
+    var userId = User.Claims.Single(c => c.Type == "sub").Value;
+    var isAdminOrCoordinator = User.HasClaim("user_type", "administrator") || User.HasClaim("user_type", "coordinator");
+
+}
+
+<h2>Index</h2>
+
+<p>
+    @if (isAdminOrCoordinator)
+    {
+        <a asp-action="Create">Create New</a>
+    }
+    </p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Goal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Repeat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Activity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.isGroupChallenge)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Groupid)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Goal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Repeat)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Activity.ActivityId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.isGroupChallenge)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Groupid)
+            </td>
+            <td>
+                @if (isAdminOrCoordinator)
+                {
+                    @:|
+                    <a asp-action="Edit" asp-route-id="@item.ChallengeId">Edit</a>
+                    @:|
+                    <a asp-action="Delete" asp-route-id="@item.ChallengeId">Delete</a>
+                    @:|
+                }
+                else
+                {
+
+                    <a asp-action="Join" asp-route-id="@item.ChallengeId">Join</a>
+                }
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

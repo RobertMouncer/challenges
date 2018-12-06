@@ -1,0 +1,73 @@
+﻿@model IEnumerable<challenges.Models.UserChallenge>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-controller="Challenges" asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.Activity.ActivityName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.StartDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.EndDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.Goal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Challenge.Activity.GoalMetric)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PercentageComplete)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.Activity.ActivityName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.StartDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.EndDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.Goal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Challenge.Activity.GoalMetric)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PercentageComplete)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.UserChallengeId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.UserChallengeId">Details</a> |
+                @if (item.Challenge.isGroupChallenge)
+                {
+                    <a asp-action="Delete" asp-route-id="@item.UserChallengeId">Leave</a>
+                }
+                else
+                {
+                    <a asp-action="Delete" asp-route-id="@item.UserChallengeId">Delete</a>
+                }
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
