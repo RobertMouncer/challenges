@@ -57,7 +57,15 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.UserChallengeId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.UserChallengeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserChallengeId">Delete</a>
+                @if (item.Challenge.isGroupChallenge)
+                {
+                    <a asp-action="Delete" asp-route-id="@item.UserChallengeId">Leave</a>
+                }
+                else
+                {
+                    <a asp-action="Delete" asp-route-id="@item.UserChallengeId">Delete</a>
+                }
+
             </td>
         </tr>
 }

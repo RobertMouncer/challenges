@@ -50,7 +50,7 @@ namespace challenges.Controllers
             }
 
             var userChallenge = await _context.UserChallenge
-                .Include(u => u.Challenge)
+                .Include(u => u.Challenge).Include(u => u.Challenge.Activity)
                 .FirstOrDefaultAsync(m => m.UserChallengeId == id);
             if (userChallenge == null)
             {

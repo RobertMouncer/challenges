@@ -2,13 +2,19 @@
 
 @{
     ViewData["Title"] = "Index";
+    var userId = User.Claims.Single(c => c.Type == "sub").Value;
+    var isAdminOrCoordinator = User.HasClaim("user_type", "administrator") || User.HasClaim("user_type", "coordinator");
+
 }
 
 <h2>Index</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
-</p>
+    @if (isAdminOrCoordinator)
+    {
+        <a asp-action="Create">Create New</a>
+    }
+    </p>
 <table class="table">
     <thead>
         <tr>
@@ -61,20 +67,20 @@
                 @Html.DisplayFor(modelItem => item.Groupid)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.ChallengeId">Details</a>
-                @if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
+                @if (isAdminOrCoordinator)
                 {
                     @:|
                     <a asp-action="Edit" asp-route-id="@item.ChallengeId">Edit</a>
                     @:|
                     <a asp-action="Delete" asp-route-id="@item.ChallengeId">Delete</a>
+                    @:|
                 }
                 else
                 {
-                    @:|
+
                     <a asp-action="Join" asp-route-id="@item.ChallengeId">Join</a>
                 }
-                        
+
             </td>
         </tr>
 }

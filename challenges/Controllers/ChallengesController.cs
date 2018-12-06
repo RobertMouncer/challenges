@@ -193,13 +193,44 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var group = await groupRepository.GetByIdAsync(id.Value);
-            if (group == null)
+             var challenge = await _context.Challenge.FindAsync(id); ;
+            if (challenge == null)
             {
                 return NotFound();
             }
 
-            return View(group);
+            return View(challenge);
+        }
+
+        [HttpPost, ActionName("Join")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> JoinConfirmed(int id)
+        {
+
+
+            var userId = User.Claims.Single(c => c.Type == "sub").Value;
+            var challenge = await _context.Challenge.FindAsync(id);
+            var userChallenge = _context.UserChallenge.Where(uc => uc.ChallengeId == id && uc.UserId == userId);
+            if (userChallenge.Count() > 0) {
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (challenge == null)
+            {
+                return NotFound();
+            }
+
+            UserChallenge user = new UserChallenge
+            {
+                UserId = userId,
+                Challenge = challenge,
+                ChallengeId = challenge.ChallengeId
+            };
+
+            _context.Add(user);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
