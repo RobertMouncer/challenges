@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication;
+using YourApp.Services;
 
 namespace challenges
 {
@@ -28,6 +29,11 @@ namespace challenges
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddHttpClient("yourNamedHttpClient", client => {
+            });
+            services.AddSingleton<IApiClient, ApiClient>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
