@@ -1,29 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using challenges.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using challenges.Models;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication;
+using System.Net;
 
 namespace challenges
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        private readonly IHostingEnvironment environment;
+        private readonly IConfigurationSection appConfig;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
+            environment = env;
+            appConfig = configuration.GetSection("Challenges");
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -31,15 +32,12 @@ namespace challenges
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-
-            var appConfig = Configuration.GetSection("challenges");
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             services.AddAuthentication(options =>
@@ -61,7 +59,8 @@ namespace challenges
                 options.Scope.Add("offline_access");
                 options.ClaimActions.MapJsonKey("locale", "locale");
                 options.ClaimActions.MapJsonKey("user_type", "user_type");
-            }).AddIdentityServerAuthentication("Bearer", options =>
+            })
+            .AddIdentityServerAuthentication("Bearer", options =>
             {
                 options.Authority = appConfig.GetValue<string>("GatekeeperUrl");
                 options.ApiName = appConfig.GetValue<string>("ApiResourceName");
@@ -76,19 +75,44 @@ namespace challenges
 
             services.AddDbContext<challengesContext>(options =>
                     options.UseMySql(Configuration.GetConnectionString("challengesContext")));
+
+            if (!environment.IsDevelopment())
+            {
+                services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    var proxyHost = appConfig.GetValue("ReverseProxyHostname", "http://nginx");
+                    var proxyAddresses = Dns.GetHostAddresses(proxyHost);
+                    foreach (var ip in proxyAddresses)
+                    {
+                        options.KnownProxies.Add(ip);
+                    }
+                });
+            }
         }
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseAuthentication();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
             else
             {
+                var pathBase = appConfig.GetValue<string>("PathBase", "/user-groups");
+                RunMigrations(app);
+                app.UsePathBase(pathBase);
+                app.Use((context, next) =>
+                {
+                    context.Request.PathBase = new PathString(pathBase);
+                    return next();
+                });
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                });
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
@@ -96,6 +120,7 @@ namespace challenges
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
@@ -103,6 +128,16 @@ namespace challenges
                     name: "default",
                     template: "{controller=Challenges}/{action=Index}/{id?}");
             });
+        }
+
+        private void RunMigrations(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var serviceProvider = serviceScope.ServiceProvider;
+                var dbContext = serviceProvider.GetService<challengesContext>();
+                dbContext.Database.Migrate();
+            }
         }
     }
 }
