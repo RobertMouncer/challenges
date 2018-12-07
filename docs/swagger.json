@@ -277,6 +277,10 @@
           "type": "string",
           "example": "2018/07/16 09:00:00"
         },
+        "activityId": {
+          "type": "integer",
+          "format": "int64"
+        },
         "activity": {
           "$ref": "#/definitions/Activity"
         },
