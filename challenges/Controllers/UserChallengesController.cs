@@ -24,21 +24,20 @@ namespace challenges.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
-            IQueryable<UserChallenge> challengesContext;
 
-            if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
+            if (isAdminOrCoord())
             {
-                 challengesContext = _context.UserChallenge.Include(u => u.Challenge)
-                                                                           .Include(a => a.Challenge.Activity)
-                                                                           .Where(c => c.UserId.Equals(userId));
+                 var challengesContext = _context.UserChallenge.Include(u => u.Challenge)
+                                                                           .Include(a => a.Challenge.Activity);
+                return View(await challengesContext.ToListAsync());
             } else
             {
-                challengesContext = _context.UserChallenge.Include(u => u.Challenge)
+                var challengesContext = _context.UserChallenge.Include(u => u.Challenge)
                                                            .Include(a => a.Challenge.Activity)
                                                            .Where(c => c.UserId.Equals(userId));
+                return View(await challengesContext.ToListAsync());
             }
-
-            return View(await challengesContext.ToListAsync());
+            
         }
 
         // GET: UserChallenges/Details/5
@@ -170,6 +169,11 @@ namespace challenges.Controllers
         private bool UserChallengeExists(int id)
         {
             return _context.UserChallenge.Any(e => e.UserChallengeId == id);
+        }
+
+        public bool isAdminOrCoord()
+        {
+            return (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator"));
         }
     }
 }

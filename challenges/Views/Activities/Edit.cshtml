@@ -15,14 +15,10 @@
             <input type="hidden" asp-for="ActivityId" />
             <div class="form-group">
                 <label asp-for="ActivityName" class="control-label"></label>
-                <input asp-for="ActivityName" class="form-control" />
+                <select asp-for="ActivityName" class="form-control" asp-items="ViewBag.ActivityName"></select>
                 <span asp-validation-for="ActivityName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="GoalMetric" class="control-label"></label>
-                <input asp-for="GoalMetric" class="form-control" />
-                <span asp-validation-for="GoalMetric" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>

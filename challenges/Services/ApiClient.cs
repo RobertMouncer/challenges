@@ -21,9 +21,9 @@ namespace YourApp.Services
 
         public ApiClient(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ApiClient> log)
         {
-            appConfig = configuration.GetSection("YourAppName");
+            appConfig = configuration.GetSection("Challenges");
             discoveryCache = new DiscoveryCache(appConfig.GetValue<string>("GatekeeperUrl"));
-            client = httpClientFactory.CreateClient("yourNamedHttpClient");
+            client = httpClientFactory.CreateClient("challengesHttpClient");
             logger = log;
         }
 
@@ -41,11 +41,11 @@ namespace YourApp.Services
                 Address = discovery.TokenEndpoint,
                 ClientId = appConfig.GetValue<string>("ClientId"),
                 ClientSecret = appConfig.GetValue<string>("ClientSecret"),
-
+                
                 // The ApiResourceName of the resources you want to access.
                 // Other valid values might be `comms`, `health_data_repository`, etc.
                 // Ask in #dev-gatekeeper for help
-                Scope = "gatekeeper health_data_repository user_groups comms"
+                Scope = "user_groups health_data_repository"
 
             };
 

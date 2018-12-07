@@ -32,7 +32,7 @@ namespace challenges
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddHttpClient("yourNamedHttpClient", client => {
+            services.AddHttpClient("challengesHttpClient", client => {
             });
             services.AddSingleton<IApiClient, ApiClient>();
 
