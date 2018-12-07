@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication;
 using YourApp.Services;
 using System.Net;
 using challenges.Data;
+using challenges.Repositories;
 
 namespace challenges
 {
@@ -32,6 +33,9 @@ namespace challenges
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IUserChallengeRepository, UserChallengeRepository>();
+            services.AddScoped<IChallengeRepository, ChallengeRepository>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
 
             services.AddHttpClient("yourNamedHttpClient", client => {
             });
