@@ -1,5 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
+using challenges.Data;
 using challenges.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,9 @@ namespace challenges.Controllers.api
     [Authorize(AuthenticationSchemes = "Bearer")]
     public class ActivitiesController : ControllerBase
     {
-        private readonly challengesContext _context;
+        private readonly ChallengesContext _context;
         
-        public ActivitiesController(challengesContext ctx)
+        public ActivitiesController(ChallengesContext ctx)
         {
             _context = ctx;
         }

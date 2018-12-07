@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +14,9 @@ namespace challenges.Controllers
     [Authorize(AuthenticationSchemes = "oidc")]
     public class UserChallengesController : Controller
     {
-        private readonly challengesContext _context;
+        private readonly ChallengesContext _context;
 
-        public UserChallengesController(challengesContext context)
+        public UserChallengesController(ChallengesContext context)
         {
             _context = context;
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +14,9 @@ namespace challenges.Controllers
     [Authorize(AuthenticationSchemes = "oidc")]
     public class ChallengesController : Controller
     {
-        private readonly challengesContext _context;
+        private readonly ChallengesContext _context;
 
-        public ChallengesController(challengesContext context)
+        public ChallengesController(ChallengesContext context)
         {
             _context = context;
         }
@@ -26,12 +27,12 @@ namespace challenges.Controllers
             IQueryable<Challenge> challengesContext;
             if (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator"))
             {
-                challengesContext =  _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+                challengesContext =  _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge);
             }
             else
             {
                 //TODO get user group and only display for that group
-                challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+                challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge);
             }
             
 
@@ -74,7 +75,7 @@ namespace challenges.Controllers
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
             if(challenge.Groupid != null)
             {
-                challenge.isGroupChallenge = true;
+                challenge.IsGroupChallenge = true;
             }
             UserChallenge user = new UserChallenge
             {
@@ -87,7 +88,7 @@ namespace challenges.Controllers
             {
                 
                 _context.Add(challenge);
-                if (!challenge.isGroupChallenge)
+                if (!challenge.IsGroupChallenge)
                 {
                     _context.Add(user);
                 }

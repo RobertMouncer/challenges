@@ -10,20 +10,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using challenges.Data;
 
 namespace challenges
 {
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        private readonly IHostingEnvironment environment;
-        private readonly IConfigurationSection appConfig;
+        private readonly IHostingEnvironment _environment;
+        private readonly IConfigurationSection _appConfig;
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
-            environment = env;
-            appConfig = configuration.GetSection("Challenges");
+            _environment = env;
+            _appConfig = configuration.GetSection("Challenges");
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -49,9 +50,9 @@ namespace challenges
             .AddOpenIdConnect("oidc", options =>
             {
                 options.SignInScheme = "Cookies";
-                options.Authority = appConfig.GetValue<string>("GatekeeperUrl");
-                options.ClientId = appConfig.GetValue<string>("ClientId");
-                options.ClientSecret = appConfig.GetValue<string>("ClientSecret");
+                options.Authority = _appConfig.GetValue<string>("GatekeeperUrl");
+                options.ClientId = _appConfig.GetValue<string>("ClientId");
+                options.ClientSecret = _appConfig.GetValue<string>("ClientSecret");
                 options.ResponseType = "code id_token";
                 options.SaveTokens = true;
                 options.GetClaimsFromUserInfoEndpoint = true;
@@ -62,8 +63,8 @@ namespace challenges
             })
             .AddIdentityServerAuthentication("Bearer", options =>
             {
-                options.Authority = appConfig.GetValue<string>("GatekeeperUrl");
-                options.ApiName = appConfig.GetValue<string>("ApiResourceName");
+                options.Authority = _appConfig.GetValue<string>("GatekeeperUrl");
+                options.ApiName = _appConfig.GetValue<string>("ApiResourceName");
             });
             services.AddAuthorization(options =>
             {
@@ -73,14 +74,14 @@ namespace challenges
                 options.AddPolicy("Coordinator", pb => pb.RequireClaim("user_type", new[] { "administrator", "coordinator" }));
             });
 
-            services.AddDbContext<challengesContext>(options =>
+            services.AddDbContext<ChallengesContext>(options =>
                     options.UseMySql(Configuration.GetConnectionString("challengesContext")));
 
-            if (!environment.IsDevelopment())
+            if (!_environment.IsDevelopment())
             {
                 services.Configure<ForwardedHeadersOptions>(options =>
                 {
-                    var proxyHost = appConfig.GetValue("ReverseProxyHostname", "http://nginx");
+                    var proxyHost = _appConfig.GetValue("ReverseProxyHostname", "http://nginx");
                     var proxyAddresses = Dns.GetHostAddresses(proxyHost);
                     foreach (var ip in proxyAddresses)
                     {
@@ -101,7 +102,7 @@ namespace challenges
             }
             else
             {
-                var pathBase = appConfig.GetValue<string>("PathBase", "/user-groups");
+                var pathBase = _appConfig.GetValue<string>("PathBase", "/user-groups");
                 RunMigrations(app);
                 app.UsePathBase(pathBase);
                 app.Use((context, next) =>
@@ -135,7 +136,7 @@ namespace challenges
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var serviceProvider = serviceScope.ServiceProvider;
-                var dbContext = serviceProvider.GetService<challengesContext>();
+                var dbContext = serviceProvider.GetService<ChallengesContext>();
                 dbContext.Database.Migrate();
             }
         }
