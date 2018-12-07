@@ -83,7 +83,7 @@ namespace challenges.Controllers
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
-
+            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
             ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
             return View();
@@ -121,6 +121,10 @@ namespace challenges.Controllers
                     _context.Add(user);
                 }
                 await _context.SaveChangesAsync();
+                if (challenge.isGroupChallenge)
+                {
+                    return RedirectToAction("Index", "Challenges");
+                }
                 return RedirectToAction("Index", "UserChallenges");
             }
 
@@ -128,7 +132,7 @@ namespace challenges.Controllers
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
-
+            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
             ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
             return View(challenge);
@@ -151,6 +155,8 @@ namespace challenges.Controllers
             var groupsResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
+
+            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
 
             ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
@@ -211,6 +217,7 @@ namespace challenges.Controllers
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
+            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
             ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
 
@@ -321,6 +328,17 @@ namespace challenges.Controllers
             return items;
         }
 
+        public IList<SelectListItem> GetGoalMetrics()
+        {
+            IList<SelectListItem> items = new List<SelectListItem>();
+
+            items.Add(new SelectListItem { Text = "Calories Burnt", Value = "CaloriesBurnt" });
+            items.Add(new SelectListItem { Text = "Steps Taken ", Value = "StepsTaken" });
+            items.Add(new SelectListItem { Text = "Metres Travelled", Value = "MetresTravelled" });
+            items.Add(new SelectListItem { Text = "Metres Elevation Gained", Value = "MetresElevationGained " });
+            return items;
+
+        }
 
     }
 }

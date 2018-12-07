@@ -39,21 +39,21 @@ namespace challenges.Controllers
                 {
                     userList.Add(u.UserId);
                 }
-                ////NEED TO ADD THIS TO CHANGE USERID SHIT
-                //var response = await client.PostAsync("https://docker2.aberfitness.biz/gatekeeper/api/Users/Batch", userList.Distinct());
-                //JArray jsonArrayOfUsers = JArray.Parse(await response.Content.ReadAsStringAsync());
-
-                //foreach (UserChallenge u in challengesContext)
-                //{
-                //    foreach (JObject j in jsonArrayOfUsers)
-                //    {
-                //        if (u.UserId == j.GetValue("id").ToString())
-                //        {
-                //            u.UserId = j.GetValue("email").ToString();
-                //        }
-                //    }
-                //}
                 
+                var response = await client.PostAsync("https://docker2.aberfitness.biz/gatekeeper/api/Users/Batch", userList.Distinct());
+                JArray jsonArrayOfUsers = JArray.Parse(await response.Content.ReadAsStringAsync());
+
+                foreach (UserChallenge u in challengesContext)
+                {
+                    foreach (JObject j in jsonArrayOfUsers)
+                    {
+                        if (u.UserId == j.GetValue("id").ToString())
+                        {
+                            u.UserId = j.GetValue("email").ToString();
+                        }
+                    }
+                }
+
                 return View(await challengesContext.ToListAsync());
             } else
             {
@@ -90,58 +90,7 @@ namespace challenges.Controllers
             return View(userChallenge);
         }
 
-        // GET: UserChallenges/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var userChallenge = await _context.UserChallenge.FindAsync(id);
-            if (userChallenge == null)
-            {
-                return NotFound();
-            }
-            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
-            return View(userChallenge);
-        }
-
-        // POST: UserChallenges/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserChallengeId,UserId,ChallengeId,PercentageComplete")] UserChallenge userChallenge)
-        {
-            if (id != userChallenge.UserChallengeId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(userChallenge);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserChallengeExists(userChallenge.UserChallengeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
-            return View(userChallenge);
-        }
+        
 
         // GET: UserChallenges/Delete/5
         public async Task<IActionResult> Delete(int? id)
