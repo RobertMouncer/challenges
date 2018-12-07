@@ -10,8 +10,6 @@ namespace challenges.Repositories
 
         Task<List<Challenge>> GetAllAsync();
 
-        Task<List<Challenge>> GetByGroupIdAsync(string groupId);
-
         Task<Challenge> AddAsync(Challenge challenge);
 
         Task<Challenge> UpdateAsync(Challenge challenge);

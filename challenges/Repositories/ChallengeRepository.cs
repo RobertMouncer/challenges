@@ -26,13 +26,13 @@ namespace challenges.Repositories
             return await _context.Challenge.ToListAsync();
         }
 
-        public async Task<List<Challenge>> GetByGroupIdAsync(string groupId)
+        /*public async Task<List<Challenge>> GetByGroupIdAsync(string groupId)
         {
             return await _context.Challenge
                 .Include(c => c.Activity)
                 .Where(m => m.Groupid == groupId)
                 .ToListAsync();
-        }
+        }*/ //TODO Remove
 
         public async Task<Challenge> AddAsync(Challenge challenge)
         {

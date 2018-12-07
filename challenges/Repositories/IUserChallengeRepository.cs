@@ -9,6 +9,8 @@ namespace challenges.Repositories
         Task<UserChallenge> GetByIdAsync(int id);
 
         Task<List<UserChallenge>> GetAllAsync();
+        
+        Task<List<UserChallenge>> GetByGroupIdAsync(string groupId);
 
         Task<UserChallenge> AddAsync(UserChallenge userChallenge);
 
