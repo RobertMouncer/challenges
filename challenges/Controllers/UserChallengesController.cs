@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using Microsoft.AspNetCore.Authorization;
+using YourApp.Services;
+using Newtonsoft.Json.Linq;
 //display all user challenges.
 namespace challenges.Controllers
 {
@@ -14,10 +16,12 @@ namespace challenges.Controllers
     public class UserChallengesController : Controller
     {
         private readonly challengesContext _context;
+        private readonly IApiClient client;
 
-        public UserChallengesController(challengesContext context)
+        public UserChallengesController(challengesContext context, IApiClient client)
         {
             _context = context;
+            this.client = client;
         }
 
         // GET: UserChallenges
@@ -27,8 +31,29 @@ namespace challenges.Controllers
 
             if (isAdminOrCoord())
             {
-                 var challengesContext = _context.UserChallenge.Include(u => u.Challenge)
+                var challengesContext = _context.UserChallenge.Include(u => u.Challenge)
                                                                            .Include(a => a.Challenge.Activity);
+                List<string> userList = new List<string>();
+
+                foreach (UserChallenge u in challengesContext)
+                {
+                    userList.Add(u.UserId);
+                }
+                ////NEED TO ADD THIS TO CHANGE USERID SHIT
+                //var response = await client.PostAsync("https://docker2.aberfitness.biz/gatekeeper/api/Users/Batch", userList.Distinct());
+                //JArray jsonArrayOfUsers = JArray.Parse(await response.Content.ReadAsStringAsync());
+
+                //foreach (UserChallenge u in challengesContext)
+                //{
+                //    foreach (JObject j in jsonArrayOfUsers)
+                //    {
+                //        if (u.UserId == j.GetValue("id").ToString())
+                //        {
+                //            u.UserId = j.GetValue("email").ToString();
+                //        }
+                //    }
+                //}
+                
                 return View(await challengesContext.ToListAsync());
             } else
             {
@@ -38,25 +63,7 @@ namespace challenges.Controllers
                 return View(await challengesContext.ToListAsync());
             }
             
-        }
 
-        // GET: UserChallenges/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var userChallenge = await _context.UserChallenge
-                .Include(u => u.Challenge).Include(u => u.Challenge.Activity)
-                .FirstOrDefaultAsync(m => m.UserChallengeId == id);
-            if (userChallenge == null)
-            {
-                return NotFound();
-            }
-
-            return View(userChallenge);
         }
 
         // GET: UserChallenges/Create

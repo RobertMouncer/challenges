@@ -10,6 +10,7 @@ namespace YourApp.Services
     public interface IApiClient
     {
         Task<HttpResponseMessage> GetAsync(string path);
+        Task<HttpResponseMessage> PostAsync(string path, object payload);
     }
 
     public class ApiClient : IApiClient
@@ -62,6 +63,12 @@ namespace YourApp.Services
         {
             client.SetBearerToken(await GetTokenAsync());
             return await client.GetAsync(uri);
+        }
+
+        public async Task<HttpResponseMessage> PostAsync(string uri, object payload)
+        {
+            client.SetBearerToken(await GetTokenAsync());
+            return await client.PostAsJsonAsync(uri, payload);
         }
     }
 

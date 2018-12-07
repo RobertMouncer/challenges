@@ -44,8 +44,13 @@ namespace challenges.Controllers
             }
             else
             {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+                var groupResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups/ForUser/" + userId);
+                var group = groupResponse.Content.ReadAsStringAsync().Result;
+                dynamic data = JsonConvert.DeserializeObject(group);
+                string groupId = data.id;
                 //TODO get user group and only display for that group
-                var challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+                var challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge && c.Groupid == groupId);
                 return View(await challengesContext.ToListAsync());
             }
             
@@ -93,12 +98,19 @@ namespace challenges.Controllers
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
+
             UserChallenge user = new UserChallenge
             {
                 UserId = userId,
                 Challenge = challenge,
                 ChallengeId = challenge.ChallengeId
             };
+
+            if (isAdminOrCoord() && !challenge.isGroupChallenge)
+            {
+                ModelState.AddModelError("isGroupChallenge","Must be a group challenge.");
+            }
+
 
             if (ModelState.IsValid)
             {
@@ -160,6 +172,12 @@ namespace challenges.Controllers
                 Challenge = challenge,
                 ChallengeId = challenge.ChallengeId
             };
+
+            if (isAdminOrCoord() && !challenge.isGroupChallenge)
+            {
+                ModelState.AddModelError("isGroupChallenge", "Must be a group challenge");
+            }
+
             if (id != challenge.ChallengeId)
             {
                 return NotFound();
@@ -302,5 +320,7 @@ namespace challenges.Controllers
             }
             return items;
         }
+
+
     }
 }
