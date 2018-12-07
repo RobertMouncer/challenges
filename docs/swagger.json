@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "title": "Challenges",
     "contact": {
       "name": "Robert",
@@ -19,7 +19,7 @@
       "description": "CRUD operations for activities."
     },
     {
-      "name": "Challenges",
+      "name": "UserChallenges",
       "description": "Challenges CRUD operations."
     }
   ],
@@ -67,10 +67,10 @@
         }
       }
     },
-    "/challenge": {
+    "/Userchallenge": {
       "post": {
         "tags": [
-          "Challenges"
+          "UserChallenges"
         ],
         "summary": "Add a new challenge for a user.",
         "operationId": "addChallenge",
@@ -87,7 +87,7 @@
             "description": "challenge object to be added.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Challenge"
+              "$ref": "#/definitions/UserChallenge"
             }
           }
         ],
@@ -95,7 +95,7 @@
           "200": {
             "description": "Successful operation.",
             "schema": {
-              "$ref": "#/definitions/Challenge"
+              "$ref": "#/definitions/UserChallenge"
             }
           },
           "405": {
@@ -107,9 +107,9 @@
     "/challenge/find/{UUID}": {
       "get": {
         "tags": [
-          "Challenges"
+          "UserChallenges"
         ],
-        "summary": "Get list of userGroup challenges.",
+        "summary": "Get list of user challenges.",
         "operationId": "getUserChallenges",
         "produces": [
           "application/json"
@@ -130,7 +130,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Challenge"
+                "$ref": "#/definitions/UserChallenge"
               }
             }
           },
@@ -146,7 +146,7 @@
     "/challenge/{ChallengeId}": {
       "put": {
         "tags": [
-          "Challenges"
+          "UserChallenges"
         ],
         "summary": "Update an existing Challenge.",
         "operationId": "updateChallenge",
@@ -171,7 +171,7 @@
             "description": "Challenge object to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Challenge"
+              "$ref": "#/definitions/UserChallenge"
             }
           }
         ],
@@ -192,7 +192,7 @@
       },
       "delete": {
         "tags": [
-          "Challenges"
+          "UserChallenges"
         ],
         "summary": "Deletes a challenge.",
         "operationId": "deleteChallenge",
@@ -226,17 +226,6 @@
   "definitions": {
     "Challenge": {
       "type": "object",
-      "required": [
-        "challengeId",
-        "startDateTime",
-        "endDateTime",
-        "activityId",
-        "goal",
-        "goalMetric",
-        "repeat",
-        "userGroup",
-        "percentageComplete"
-      ],
       "properties": {
         "challengeId": {
           "type": "integer",
@@ -257,15 +246,15 @@
           "type": "integer",
           "format": "int64"
         },
-        "percentageComplete": {
-          "type": "integer",
-          "format": "int64"
-        },
         "repeat": {
           "type": "boolean"
         },
-        "userGroup": {
-          "$ref": "#/definitions/UserGroup"
+        "isGroupChallenge": {
+          "type": "boolean"
+        },
+        "groupId": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -291,13 +280,10 @@
         }
       }
     },
-    "UserGroup": {
+    "UserChallenge": {
       "type": "object",
-      "required": [
-        "userGroupId"
-      ],
       "properties": {
-        "userGroupId": {
+        "userChallengeId": {
           "type": "integer",
           "format": "int64"
         },
@@ -305,13 +291,12 @@
           "type": "integer",
           "format": "int64"
         },
-        "GroupId": {
+        "challengeId": {
+          "$ref": "#/definitions/Challenge"
+        },
+        "percentageComplete": {
           "type": "integer",
           "format": "int64"
-        },
-        "isGroup": {
-          "type": "boolean",
-          "example": true
         }
       }
     }
