@@ -14,42 +14,55 @@ namespace challenges.Controllers.api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
     public class ChallengesController : ControllerBase
     {
-        private readonly IChallengeRepository challengeRepository;
-        private readonly IUserChallengeRepository userChallengeRepository;
+        private readonly IChallengeRepository _challengeRepository;
+        private readonly IUserChallengeRepository _userChallengeRepository;
+        private readonly IActivityRepository _activityRepository;
 
-        public ChallengesController(IChallengeRepository challengeRepository, IUserChallengeRepository userChallengeRepository)
+        public ChallengesController(IChallengeRepository challengeRepository, 
+            IUserChallengeRepository userChallengeRepository, IActivityRepository activityRepository)
         {
-            this.challengeRepository = challengeRepository;
-            this.userChallengeRepository = userChallengeRepository;
+            _challengeRepository = challengeRepository;
+            _userChallengeRepository = userChallengeRepository;
+            _activityRepository = activityRepository;
         }
 
         [HttpPost]
         public async Task<IActionResult> NewChallenge([FromBody] UserChallenge userChallenge)
         {
-            //TODO Possibly add some validation
+            await ValidateUserChallenge(userChallenge);
             
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             
-            await userChallengeRepository.AddAsync(userChallenge);
-            await challengeRepository.AddAsync(userChallenge.Challenge);
+            await _userChallengeRepository.AddAsync(userChallenge);
 
             return Ok(userChallenge);
         }
 
-        [HttpGet("find/{id:int}")]
-        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] int id)
+        [HttpGet("find/{ugid:int}")]
+        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] int ugid)
         {
-            var userChallenges = await userChallengeRepository.GetByGroupIdAsync(id);
+            var userChallenges = await _userChallengeRepository.GetByGroupIdAsync(ugid);
 
             if (userChallenges == null)
                 return NotFound();
             
+            return Ok(userChallenges);
+        }
+
+        [HttpGet("fromUser/{uid}")]
+        public async Task<IActionResult> ListPersonalChallenges([FromRoute] string uid)
+        {
+            var userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
+
+            if (userChallenges == null)
+                return NotFound();
+
             return Ok(userChallenges);
         }
 
@@ -60,28 +73,39 @@ namespace challenges.Controllers.api
             {
                 ModelState.AddModelError("Id", "Id must match URL parameter.");
             }
-            
-            //TODO Possibly add some validation
+
+            await ValidateUserChallenge(userChallenge);
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await userChallengeRepository.UpdateAsync(userChallenge);
+            await _userChallengeRepository.UpdateAsync(userChallenge);
 
             return Ok(userChallenge);
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteChallenge([FromRoute] int id)
+        public async Task<IActionResult> DeleteUserChallenge([FromRoute] int id)
         {
-            var userChallenge = await userChallengeRepository.GetByIdAsync(id);
+            var userChallenge = await _userChallengeRepository.GetByIdAsync(id);
             if (userChallenge == null)
                 return NotFound();
 
-            await userChallengeRepository.DeleteAsync(userChallenge);
+            await _challengeRepository.DeleteAsync(userChallenge.Challenge);
+            //await _userChallengeRepository.DeleteAsync(userChallenge);
             return Ok(userChallenge);
+        }
+
+        private async Task ValidateUserChallenge(UserChallenge userChallenge)
+        {
+            if (userChallenge.Challenge.IsGroupChallenge)
+                ModelState.AddModelError("IsGroupChallenge", "Invalid userChallenge, must be a personal challenge.");
+
+            var activity = await _activityRepository.GetByIdAsync(userChallenge.Challenge.Activity.ActivityId);
+            if (activity == null)
+                ModelState.AddModelError("activityId", "Invalid Activity id received, activity doesn't exist.");
         }
     }
 }

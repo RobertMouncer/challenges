@@ -18,39 +18,35 @@ namespace challenges.Repositories
         
         public async Task<Challenge> GetByIdAsync(int id)
         {
-            return await _context.Challenge.SingleOrDefaultAsync(g => g.ActivityId == id);
+            return await _context.Challenge
+                    .Include(b => b.Activity)
+                    .SingleOrDefaultAsync(g => g.ChallengeId == id);
         }
 
         public async Task<List<Challenge>> GetAllAsync()
         {
-            return await _context.Challenge.ToListAsync();
-        }
-
-        /*public async Task<List<Challenge>> GetByGroupIdAsync(string groupId)
-        {
             return await _context.Challenge
-                .Include(c => c.Activity)
-                .Where(m => m.Groupid == groupId)
-                .ToListAsync();
-        }*/ //TODO Remove
+                    .Include(b => b.Activity)
+                    .ToListAsync();
+        }
 
         public async Task<Challenge> AddAsync(Challenge challenge)
         {
-            _context.Add(challenge);
+            _context.Challenge.Add(challenge);
             await _context.SaveChangesAsync();
             return challenge;
         }
 
         public async Task<Challenge> UpdateAsync(Challenge challenge)
         {
-            _context.Update(challenge);
+            _context.Challenge.Update(challenge);
             await _context.SaveChangesAsync();
             return challenge;
         }
 
         public async Task<Challenge> DeleteAsync(Challenge challenge)
         {
-            _context.Remove(challenge);
+            _context.Challenge.Remove(challenge);
             await _context.SaveChangesAsync();
             return challenge;
         }
