@@ -9,12 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
-//Index page will be used to display group challenges that users can join. The create function will be used by the userChallenge to create a challenge for the user.
+
 namespace challenges.Controllers.api
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class ChallengesController : ControllerBase
     {
         private readonly ChallengesContext _context;
