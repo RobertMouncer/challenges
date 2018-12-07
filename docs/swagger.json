@@ -159,8 +159,7 @@
             "in": "path",
             "description": "User ID to retrieve challenges for.",
             "required": true,
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           }
         ],
         "responses": {
