@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
+using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
 //Index page will be used to display group challenges that users can join. The create function will be used by the userChallenge to create a challenge for the user.
 namespace challenges.Controllers.api
@@ -17,66 +18,72 @@ namespace challenges.Controllers.api
     public class ChallengesController : ControllerBase
     {
         private readonly ChallengesContext _context;
+        private readonly IChallengeRepository challengeRepository;
+        private readonly IUserChallengeRepository userChallengeRepository;
 
-        public ChallengesController(ChallengesContext context)
+        public ChallengesController(IChallengeRepository challengeRepository, IUserChallengeRepository userChallengeRepository)
         {
-            _context = context;
+            this.challengeRepository = challengeRepository;
+            this.userChallengeRepository = userChallengeRepository;
         }
 
         [HttpPost]
-        public IActionResult NewChallenge([FromBody] Challenge challenge)
+        public async Task<IActionResult> NewChallenge([FromBody] UserChallenge userChallenge)
         {
+            //TODO Possibly add some validation
+            
             if (ModelState.IsValid)
             {
-                _context.Challenge.Add(challenge);
-                return Ok(ModelState);
+                return BadRequest(ModelState);
             }
-            return BadRequest(ModelState);
+            
+            await userChallengeRepository.AddAsync(userChallenge);
+            await challengeRepository.AddAsync(userChallenge.Challenge);
+
+            return Ok(userChallenge);
         }
 
         [HttpGet("find/{id:int}")]
-        public IActionResult ListUserGroupChallenges([FromRoute] int? id)
+        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] int id)
         {
-            if (id != null)
-            {
-                String sid = id.ToString();
-                var challenges = _context.Challenge
-                    .Include(c => c.Activity)
-                    .Where(m => m.Groupid == sid);
-                
-                return Ok(challenges);
-                
-            }
-            return BadRequest("ID was Null");
+            String sid = id.ToString();
+            var userChallenges = await userChallengeRepository.GetByGroupIdAsync(sid);
+
+            if (userChallenges == null)
+                return NotFound();
+            
+            return Ok(userChallenges);
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult UpdateChallenge([FromRoute] int? id, [FromBody] Challenge challenge)
+        public async Task<IActionResult> UpdateChallenge([FromRoute] int id, [FromBody] UserChallenge userChallenge)
         {
-            if (challenge.ChallengeId == id && ModelState.IsValid)
+            if (userChallenge.UserChallengeId != id)
             {
-                _context.Challenge.Update(challenge);
-
-                return Ok(challenge);
+                ModelState.AddModelError("Id", "Id must match URL parameter.");
             }
-            return BadRequest();
+            
+            //TODO Possibly add some validation
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await userChallengeRepository.UpdateAsync(userChallenge);
+
+            return Ok(userChallenge);
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteChallenge([FromRoute] int? id)
+        public async Task<IActionResult> DeleteChallenge([FromRoute] int id)
         {
-            if (id != null)
-            {
-                var challenge = _context.Challenge
-                    .Include(c => c.Activity)
-                    .FirstOrDefaultAsync(m => m.ChallengeId == id);
+            var userChallenge = await userChallengeRepository.GetByIdAsync(id);
+            if (userChallenge == null)
+                return NotFound();
 
-                if (challenge == null)
-                    return NotFound();
-                
-                
-            }
-            return StatusCode(501);
+            await userChallengeRepository.DeleteAsync(userChallenge);
+            return Ok(userChallenge);
         }
     }
 }

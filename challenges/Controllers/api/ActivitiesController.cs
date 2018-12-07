@@ -2,6 +2,7 @@ using System.Net;
 using System.Threading.Tasks;
 using challenges.Data;
 using challenges.Models;
+using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,18 +13,20 @@ namespace challenges.Controllers.api
     [Authorize(AuthenticationSchemes = "Bearer")]
     public class ActivitiesController : ControllerBase
     {
-        private readonly ChallengesContext _context;
+        private readonly IActivityRepository activityRepository;
         
-        public ActivitiesController(ChallengesContext ctx)
+        public ActivitiesController(IActivityRepository activityRepository)
         {
-            _context = ctx;
+            this.activityRepository = activityRepository;
         }
         
         [HttpGet]
-        public IActionResult GetActivities()
+        public async Task<IActionResult> GetActivities()
         {
-            //TODO Implement functionality.
-            return StatusCode(501);
+            var activities = await activityRepository.GetAllAsync();
+            if (activities == null)
+                return NotFound();
+            return Ok(activities);
         }
     }
 }
