@@ -17,7 +17,6 @@ namespace challenges.Controllers.api
     [Authorize(AuthenticationSchemes = "Bearer")]
     public class ChallengesController : ControllerBase
     {
-        private readonly ChallengesContext _context;
         private readonly IChallengeRepository challengeRepository;
         private readonly IUserChallengeRepository userChallengeRepository;
 
@@ -46,8 +45,7 @@ namespace challenges.Controllers.api
         [HttpGet("find/{id:int}")]
         public async Task<IActionResult> ListUserGroupChallenges([FromRoute] int id)
         {
-            String sid = id.ToString();
-            var userChallenges = await userChallengeRepository.GetByGroupIdAsync(sid);
+            var userChallenges = await userChallengeRepository.GetByGroupIdAsync(id);
 
             if (userChallenges == null)
                 return NotFound();

@@ -25,7 +25,7 @@ namespace challenges.Repositories
             return await _context.UserChallenge.ToListAsync();
         }
 
-        public async Task<List<UserChallenge>> GetByGroupIdAsync(string groupId)
+        public async Task<List<UserChallenge>> GetByGroupIdAsync(int groupId)
         {
             return await _context.UserChallenge
                 .Include(b => b.Challenge)

@@ -16,6 +16,6 @@ namespace challenges.Models
         public virtual Activity Activity {get; set;}
         public virtual int ActivityId { get; set; }
         public virtual bool IsGroupChallenge { get; set; }
-        public virtual string Groupid { get; set; }
+        public virtual int Groupid { get; set; }
     }
 }
