@@ -12,7 +12,7 @@
 <p>
     @if (isAdminOrCoordinator)
     {
-        <a asp-action="Create">Create New</a>
+        <a asp-action="Create">Create New Group Challenge</a>
     }
     </p>
 <table class="table">
@@ -28,17 +28,20 @@
                 @Html.DisplayNameFor(model => model.Goal)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.GoalMetric)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Repeat)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Activity)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.isGroupChallenge)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Groupid)
-            </th>
+            @if (isAdminOrCoordinator)
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Groupid)
+                </th>
+            }
             <th></th>
         </tr>
     </thead>
@@ -55,25 +58,26 @@
                 @Html.DisplayFor(modelItem => item.Goal)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.GoalMetric)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Repeat)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Activity.ActivityId)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.isGroupChallenge)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Groupid)
-            </td>
+            @if (isAdminOrCoordinator)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Groupid)
+                </td>
+            }
             <td>
                 @if (isAdminOrCoordinator)
                 {
-                    @:|
                     <a asp-action="Edit" asp-route-id="@item.ChallengeId">Edit</a>
                     @:|
                     <a asp-action="Delete" asp-route-id="@item.ChallengeId">Delete</a>
-                    @:|
                 }
                 else
                 {

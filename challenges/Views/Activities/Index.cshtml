@@ -15,9 +15,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.ActivityName)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GoalMetric)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -26,9 +23,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.ActivityName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GoalMetric)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ActivityId">Edit</a> |

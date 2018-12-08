@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Edit";
+    var userId = User.Claims.Single(c => c.Type == "sub").Value;
+    var isAdminOrCoordinator = User.HasClaim("user_type", "administrator") || User.HasClaim("user_type", "coordinator");
 }
 
 <h2>Edit</h2>
@@ -24,10 +26,33 @@
                 <span asp-validation-for="EndDateTime" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="ActivityId" class="control-label"></label>
+                <select asp-for="ActivityId" class="form-control" asp-items="ViewBag.ActivityId"></select>
+            </div>
+            <div class="form-group">
                 <label asp-for="Goal" class="control-label"></label>
                 <input asp-for="Goal" class="form-control" />
                 <span asp-validation-for="Goal" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="GoalMetric" class="control-label"></label>
+                <select asp-for="GoalMetric" class="form-control" asp-items="ViewBag.GoalMetric"></select>
+            </div>
+            @if (isAdminOrCoordinator)
+            {
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input asp-for="isGroupChallenge" /> @Html.DisplayNameFor(model => model.isGroupChallenge)
+                            <span asp-validation-for="isGroupChallenge" class="text-danger"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Groupid" class="control-label"></label>
+                    <select asp-for="Groupid" class="form-control" asp-items="ViewBag.Groupid"></select>
+                </div>
+            }
             <div class="form-group">
                 <div class="checkbox">
                     <label>
@@ -36,24 +61,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label asp-for="ActivityId" class="control-label"></label>
-                <select asp-for="ActivityId" class="form-control" asp-items="ViewBag.ActivityId"></select>
-                <span asp-validation-for="ActivityId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="isGroupChallenge" /> @Html.DisplayNameFor(model => model.isGroupChallenge)
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="Groupid" class="control-label"></label>
-                <input asp-for="Groupid" class="form-control" />
-                <span asp-validation-for="Groupid" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Update" class="btn btn-default" />
             </div>
         </form>
     </div>

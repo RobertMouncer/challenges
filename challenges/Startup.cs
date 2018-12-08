@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication;
 using YourApp.Services;
 using System.Net;
 
@@ -32,7 +31,7 @@ namespace challenges
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddHttpClient("yourNamedHttpClient", client => {
+            services.AddHttpClient("challengesHttpClient", client => {
             });
             services.AddSingleton<IApiClient, ApiClient>();
 

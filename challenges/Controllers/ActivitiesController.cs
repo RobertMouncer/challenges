@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using Microsoft.AspNetCore.Authorization;
+using YourApp.Services;
+using Newtonsoft.Json;
 
 
 //simply store info about an activity. Nice and easy.
@@ -16,10 +18,12 @@ namespace challenges.Controllers
     public class ActivitiesController : Controller
     {
         private readonly challengesContext _context;
+        private readonly IApiClient client;
 
-        public ActivitiesController(challengesContext context)
+        public ActivitiesController(challengesContext context, IApiClient client)
         {
             _context = context;
+            this.client = client;
         }
 
         // GET: Activities
@@ -46,9 +50,31 @@ namespace challenges.Controllers
             return View(activity);
         }
 
-        // GET: Activities/Create
-        public IActionResult Create()
+        public IList<SelectListItem> GetActivities(string activitiesContent)
         {
+            dynamic data = JsonConvert.DeserializeObject(activitiesContent);
+            IList<SelectListItem> items = new List<SelectListItem>();
+            int i = 0;
+
+            foreach (var d in data)
+            {
+                i++;
+                var dataName = (string)d.name;
+                var item = new SelectListItem { Text = dataName, Value = i.ToString() };
+                items.Add(item);
+            }
+            return items;
+        }
+
+        // GET: Activities/Create
+        public async Task<IActionResult> Create()
+        {
+
+            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+            var items = GetActivities(activitiesContent);
+
+            ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
             return View();
         }
 
@@ -57,14 +83,25 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ActivityId,ActivityName,GoalMetric")] Activity activity)
+        public async Task<IActionResult> Create([Bind("ActivityId,ActivityName")] Activity activity)
         {
+            if (ActivityNameExists(activity.ActivityName))
+            {
+                ModelState.AddModelError("ActivityName", "Activity already exists. Please enter another activity.");
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(activity);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+            var items = GetActivities(activitiesContent);
+
+            ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
+
             return View(activity);
         }
 
@@ -81,6 +118,12 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
+
+            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+            var items = GetActivities(activitiesContent);
+
+            ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
             return View(activity);
         }
 
@@ -89,8 +132,12 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ActivityId,ActivityName,GoalMetric")] Activity activity)
+        public async Task<IActionResult> Edit(int id, [Bind("ActivityId,ActivityName")] Activity activity)
         {
+            if (ActivityNameExists(activity.ActivityName))
+            {
+                ModelState.AddModelError("ActivityName", "Activity already exists. Please enter another activity.");
+            }
             if (id != activity.ActivityId)
             {
                 return NotFound();
@@ -116,6 +163,12 @@ namespace challenges.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+            var items = GetActivities(activitiesContent);
+
+            ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
             return View(activity);
         }
 
@@ -152,5 +205,11 @@ namespace challenges.Controllers
         {
             return _context.Activity.Any(e => e.ActivityId == id);
         }
+
+        private bool ActivityNameExists(string name)
+        {
+            return _context.Activity.Any(e => e.ActivityName == name);
+        }
+
     }
 }
