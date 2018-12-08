@@ -32,6 +32,7 @@ namespace challenges.Controllers
             if (isAdminOrCoord())
             {
                 var challengesContext =  _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+
                 foreach(var c in challengesContext)
                 {
                     var groupResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups/" + c.Groupid);
@@ -98,6 +99,14 @@ namespace challenges.Controllers
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
+            if (DateTime.Compare(challenge.StartDateTime, DateTime.Now) <= 0)
+            {
+                ModelState.AddModelError("StartDateTime", "Date/Time is in the past. Please enter future Date/Time.");
+            }
+            if (DateTime.Compare(challenge.EndDateTime, challenge.StartDateTime) <= 0)
+            {
+                ModelState.AddModelError("EndDateTime", "End Date/Time should be after the start Date/Time. Please re-enter Date/Time.");
+            }
 
             UserChallenge user = new UserChallenge
             {
@@ -120,7 +129,9 @@ namespace challenges.Controllers
                 {
                     _context.Add(user);
                 }
+
                 await _context.SaveChangesAsync();
+
                 if (challenge.isGroupChallenge)
                 {
                     return RedirectToAction("Index", "Challenges");
@@ -152,6 +163,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
+
             var groupsResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
@@ -178,6 +190,15 @@ namespace challenges.Controllers
                 Challenge = challenge,
                 ChallengeId = challenge.ChallengeId
             };
+
+            if (DateTime.Compare(challenge.StartDateTime, DateTime.Now) <= 0)
+            {
+                ModelState.AddModelError("StartDateTime", "Date/Time is in the past. Please enter future Date/Time.");
+            }
+            if (DateTime.Compare(challenge.EndDateTime, challenge.StartDateTime) <= 0)
+            {
+                ModelState.AddModelError("EndDateTime", "End Date/Time should be after the start Date/Time. Please re-enter Date/Time.");
+            }
 
             if (isAdminOrCoord() && !challenge.isGroupChallenge)
             {
