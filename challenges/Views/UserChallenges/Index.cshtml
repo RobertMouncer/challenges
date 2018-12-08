@@ -11,11 +11,11 @@
 <p>
     @if (isAdminOrCoordinator)
     {
-        <a asp-controller="Challenges" asp-action="Create">Create New Group Challenge</a>
+        <a asp-controller="ChallengesManage" asp-action="Create">Create New Group Challenge</a>
     }
     else
     {
-        <a asp-controller="Challenges" asp-action="Create">Create Personal Challenge</a>
+        <a asp-controller="ChallengesManage" asp-action="Create">Create Personal Challenge</a>
     }
 </p>
 <table class="table">
