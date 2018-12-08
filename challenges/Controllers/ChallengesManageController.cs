@@ -13,12 +13,12 @@ using Newtonsoft.Json;
 namespace challenges.Controllers
 {
     [Authorize(AuthenticationSchemes = "oidc")]
-    public class ChallengesController : Controller
+    public class ChallengesManageController : Controller
     {
         private readonly challengesContext _context;
         private readonly IApiClient client;
 
-        public ChallengesController(challengesContext context, IApiClient client)
+        public ChallengesManageController(challengesContext context, IApiClient client)
         {
             _context = context;
             this.client = client;
