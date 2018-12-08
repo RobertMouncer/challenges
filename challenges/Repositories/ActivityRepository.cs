@@ -53,6 +53,11 @@ namespace challenges.Repositories
             return activity;
         }
 
+        public DbSet<Activity> GetDBSet()
+        {
+            return _context.Activity;
+        }
+
         public bool Exists(int id)
         {
             return _context.Activity.Any(e => e.ActivityId == id);

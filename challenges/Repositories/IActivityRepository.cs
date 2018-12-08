@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using challenges.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace challenges.Repositories
 {
@@ -17,6 +18,8 @@ namespace challenges.Repositories
         Task<Activity> UpdateAsync(Activity activity);
 
         Task<Activity> DeleteAsync(Activity activity);
+
+        DbSet<Activity> GetDBSet();
 
         bool Exists(int id);
 
