@@ -15,5 +15,9 @@ namespace challenges.Repositories
         Task<Activity> UpdateAsync(Activity activity);
 
         Task<Activity> DeleteAsync(Activity activity);
+
+        bool Exists(int id);
+
+        bool Exists(string name);
     }
 }

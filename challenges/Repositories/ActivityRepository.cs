@@ -18,7 +18,7 @@ namespace challenges.Repositories
         
         public async Task<Activity> GetByIdAsync(int id)
         {
-            return await _context.Activity.SingleOrDefaultAsync(g => g.ActivityId == id);
+            return await _context.Activity.FindAsync(id);
         }
 
         public async Task<List<Activity>> GetAllAsync()
@@ -45,6 +45,16 @@ namespace challenges.Repositories
             _context.Remove(activity);
             await _context.SaveChangesAsync();
             return activity;
+        }
+
+        public bool Exists(int id)
+        {
+            return _context.Activity.Any(e => e.ActivityId == id);
+        }
+        
+        public bool Exists(string name)
+        {
+            return _context.Activity.Any(e => e.ActivityName == name);
         }
     }
 }
