@@ -12,7 +12,5 @@ namespace challenges.Models
         public virtual int ActivityId { get; set; }
         [Required]
         public virtual string ActivityName { get; set; }
-        [Required]
-        public virtual string GoalMetric { get; set; }
     }
 }

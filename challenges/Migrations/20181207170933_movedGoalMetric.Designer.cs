@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using challenges.Data;
+using challenges.Models;
 
 namespace challenges.Migrations
 {
-    [DbContext(typeof(ChallengesContext))]
-    [Migration("20181207030242_group_id_to_int")]
-    partial class group_id_to_int
+    [DbContext(typeof(challengesContext))]
+    [Migration("20181207170933_movedGoalMetric")]
+    partial class movedGoalMetric
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -46,11 +46,11 @@ namespace challenges.Migrations
 
                     b.Property<string>("Groupid");
 
-                    b.Property<bool>("IsGroupChallenge");
-
                     b.Property<bool>("Repeat");
 
                     b.Property<DateTime>("StartDateTime");
+
+                    b.Property<bool>("isGroupChallenge");
 
                     b.HasKey("ChallengeId");
 
