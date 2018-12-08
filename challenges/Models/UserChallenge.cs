@@ -8,15 +8,10 @@ namespace challenges.Models
 {
     public class UserChallenge
     {
-        [Key]
         public virtual int UserChallengeId { get; set; }
-        [Required]
         public virtual string UserId { get; set; }
-        
         public virtual Challenge Challenge { get; set; }
-        [Required]
         public virtual int ChallengeId { get; set; }
-        [Required]
         public virtual int PercentageComplete { get; set; }
     }
 }

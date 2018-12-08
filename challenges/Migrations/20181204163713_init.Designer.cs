@@ -9,7 +9,7 @@ using challenges.Models;
 
 namespace challenges.Migrations
 {
-    [DbContext(typeof(ChallengesContext))]
+    [DbContext(typeof(challengesContext))]
     [Migration("20181204163713_init")]
     partial class Init
     {

@@ -32,7 +32,7 @@ namespace challenges.Controllers
             
             if (isAdminOrCoord())
             {
-                var challengesContext =  _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+                var challengesContext =  _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge);
 
                 foreach(var c in challengesContext)
                 {
@@ -52,7 +52,7 @@ namespace challenges.Controllers
                 dynamic data = JsonConvert.DeserializeObject(group);
                 string groupId = data.id;
                 //TODO get user group and only display for that group
-                var challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge && c.Groupid == groupId);
+                var challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge /*&& c.Groupid == groupId*/);
                 return View(await challengesContext.ToListAsync());
             }
             
@@ -116,7 +116,7 @@ namespace challenges.Controllers
                 ChallengeId = challenge.ChallengeId
             };
 
-            if (isAdminOrCoord() && !challenge.isGroupChallenge)
+            if (isAdminOrCoord() && !challenge.IsGroupChallenge)
             {
                 ModelState.AddModelError("isGroupChallenge","Must be a group challenge.");
             }
@@ -133,7 +133,7 @@ namespace challenges.Controllers
 
                 await _context.SaveChangesAsync();
 
-                if (challenge.isGroupChallenge)
+                if (challenge.IsGroupChallenge)
                 {
                     return RedirectToAction("Index", "Challenges");
                 }
@@ -201,7 +201,7 @@ namespace challenges.Controllers
                 ModelState.AddModelError("EndDateTime", "End Date/Time should be after the start Date/Time. Please re-enter Date/Time.");
             }
 
-            if (isAdminOrCoord() && !challenge.isGroupChallenge)
+            if (isAdminOrCoord() && !challenge.IsGroupChallenge)
             {
                 ModelState.AddModelError("isGroupChallenge", "Must be a group challenge");
             }
@@ -216,7 +216,7 @@ namespace challenges.Controllers
                 try
                 {
                     _context.Update(challenge);
-                    if (!challenge.isGroupChallenge)
+                    if (!challenge.IsGroupChallenge)
                     {
                         _context.Add(user);
                     }

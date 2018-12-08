@@ -10,9 +10,9 @@ namespace challenges.Repositories
 {
     public class UserChallengeRepository : IUserChallengeRepository
     {
-        private readonly ChallengesContext _context;
+        private readonly challengesContext _context;
 
-        public UserChallengeRepository(ChallengesContext context)
+        public UserChallengeRepository(challengesContext context)
         {
             _context = context;
         }
@@ -32,7 +32,7 @@ namespace challenges.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<UserChallenge>> GetByGroupIdAsync(int groupId)
+        public async Task<List<UserChallenge>> GetByGroupIdAsync(string groupId)
         {
             return await _context.UserChallenge
                 .Include(b => b.Challenge)

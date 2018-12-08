@@ -8,9 +8,7 @@ namespace challenges.Models
 {
     public class Activity
     {
-        [Key]
         public virtual int ActivityId { get; set; }
-        [Required]
         public virtual string ActivityName { get; set; }
     }
 }

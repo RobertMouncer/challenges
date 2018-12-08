@@ -2,9 +2,9 @@
 
 namespace challenges.Data
 {
-    public class ChallengesContext : DbContext
+    public class challengesContext : DbContext
     {
-        public ChallengesContext (DbContextOptions<ChallengesContext> options)
+        public challengesContext (DbContextOptions<challengesContext> options)
             : base(options)
         {
         }

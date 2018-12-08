@@ -10,7 +10,7 @@ namespace challenges.Repositories
 
         Task<List<UserChallenge>> GetAllAsync();
         
-        Task<List<UserChallenge>> GetByGroupIdAsync(int groupId);
+        Task<List<UserChallenge>> GetByGroupIdAsync(string groupId);
 
         Task<List<UserChallenge>> GetAllPersonalChallenges(string userId);
 

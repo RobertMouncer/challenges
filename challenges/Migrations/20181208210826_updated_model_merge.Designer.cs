@@ -8,9 +8,9 @@ using challenges.Data;
 
 namespace challenges.Migrations
 {
-    [DbContext(typeof(ChallengesContext))]
-    [Migration("20181207030242_group_id_to_int")]
-    partial class group_id_to_int
+    [DbContext(typeof(challengesContext))]
+    [Migration("20181208210826_updated_model_merge")]
+    partial class updated_model_merge
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -7,7 +7,7 @@ using challenges.Data;
 
 namespace challenges.Migrations
 {
-    [DbContext(typeof(ChallengesContext))]
+    [DbContext(typeof(challengesContext))]
     partial class ChallengesContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -22,11 +22,7 @@ namespace challenges.Migrations
                     b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ActivityName")
-                        .IsRequired();
-
-                    b.Property<string>("GoalMetric")
-                        .IsRequired();
+                    b.Property<string>("ActivityName");
 
                     b.HasKey("ActivityId");
 
@@ -44,7 +40,9 @@ namespace challenges.Migrations
 
                     b.Property<int>("Goal");
 
-                    b.Property<int>("Groupid");
+                    b.Property<string>("GoalMetric");
+
+                    b.Property<string>("Groupid");
 
                     b.Property<bool>("IsGroupChallenge");
 
@@ -68,8 +66,7 @@ namespace challenges.Migrations
 
                     b.Property<int>("PercentageComplete");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<string>("UserId");
 
                     b.HasKey("UserChallengeId");
 

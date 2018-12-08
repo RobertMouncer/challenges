@@ -84,7 +84,7 @@ namespace challenges
                 options.AddPolicy("Coordinator", pb => pb.RequireClaim("user_type", new[] { "administrator", "coordinator" }));
             });
 
-            services.AddDbContext<ChallengesContext>(options =>
+            services.AddDbContext<challengesContext>(options =>
                     options.UseMySql(Configuration.GetConnectionString("challengesContext")));
 
             if (!_environment.IsDevelopment())
@@ -146,7 +146,7 @@ namespace challenges
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var serviceProvider = serviceScope.ServiceProvider;
-                var dbContext = serviceProvider.GetService<ChallengesContext>();
+                var dbContext = serviceProvider.GetService<challengesContext>();
                 dbContext.Database.Migrate();
             }
         }

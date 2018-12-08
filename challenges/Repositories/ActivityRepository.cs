@@ -9,9 +9,9 @@ namespace challenges.Repositories
 {
     public class ActivityRepository : IActivityRepository
     {
-        private readonly ChallengesContext _context;
+        private readonly challengesContext _context;
 
-        public ActivityRepository(ChallengesContext context)
+        public ActivityRepository(challengesContext context)
         {
             _context = context;
         }
