@@ -8,6 +8,8 @@ namespace challenges.Repositories
     {
         Task<Activity> GetByIdAsync(int id);
 
+        Task<Activity> GetByIdIncAsync(int id);
+
         Task<List<Activity>> GetAllAsync();
 
         Task<Activity> AddAsync(Activity activity);

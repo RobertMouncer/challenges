@@ -42,7 +42,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var activity = await _activityRepository.GetByIdAsync((int) id);
+            var activity = await _activityRepository.GetByIdIncAsync((int) id);
             if (activity == null)
             {
                 return NotFound();
@@ -179,7 +179,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var activity = await _activityRepository.GetByIdAsync((int) id);
+            var activity = await _activityRepository.GetByIdIncAsync((int) id);
             if (activity == null)
             {
                 return NotFound();
