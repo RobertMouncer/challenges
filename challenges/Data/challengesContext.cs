@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using challenges.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace challenges.Models
+namespace challenges.Data
 {
     public class challengesContext : DbContext
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,7 +8,6 @@ namespace challenges.Models
 {
     public class Challenge
     {
-
         public virtual int ChallengeId { get; set; }
         public virtual DateTime StartDateTime { get; set; }
         public virtual DateTime EndDateTime { get; set; }
@@ -16,7 +16,7 @@ namespace challenges.Models
         public virtual bool Repeat { get; set; }
         public virtual Activity Activity {get; set;}
         public virtual int ActivityId { get; set; }
-        public virtual bool isGroupChallenge { get; set; }
+        public virtual bool IsGroupChallenge { get; set; }
         public virtual string Groupid { get; set; }
     }
 }

@@ -48,7 +48,7 @@
                     @Html.DisplayNameFor(model => model.UserId)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Challenge.isGroupChallenge)
+                    @Html.DisplayNameFor(model => model.Challenge.IsGroupChallenge)
                 </th>
             }
             <th></th>
@@ -84,12 +84,12 @@
                     @Html.DisplayFor(modelItem => item.UserId)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Challenge.isGroupChallenge)
+                    @Html.DisplayFor(modelItem => item.Challenge.IsGroupChallenge)
                 </td>
             }
             <td>
                 
-                @if (item.Challenge.isGroupChallenge)
+                @if (item.Challenge.IsGroupChallenge)
                 {
                     <a asp-action="Delete" asp-route-id="@item.UserChallengeId">Leave</a>
                 }

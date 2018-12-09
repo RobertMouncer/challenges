@@ -67,7 +67,7 @@
         }
       }
     },
-    "/Userchallenge": {
+    "/challenge": {
       "post": {
         "tags": [
           "UserChallenges"
@@ -104,19 +104,19 @@
         }
       }
     },
-    "/challenge/find/{UUID}": {
+    "/challenge/find/{UGID}": {
       "get": {
         "tags": [
           "UserChallenges"
         ],
         "summary": "Get list of user challenges.",
-        "operationId": "getUserChallenges",
+        "operationId": "getGroupChallenges",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "UUID",
+            "name": "UGID",
             "in": "path",
             "description": "UserGroupId to retrieve challenges for.",
             "required": true,
@@ -135,10 +135,48 @@
             }
           },
           "400": {
-            "description": "Invalid UUID supplied."
+            "description": "Invalid UGID supplied."
           },
           "404": {
-            "description": "UserGroup not found."
+            "description": "UserGroup Challenges not found."
+          }
+        }
+      }
+    },
+    "/challenge/fromUser/{UID}": {
+      "get": {
+        "tags": [
+          "UserChallenges"
+        ],
+        "summary": "Get list of a Users Personal Challenges",
+        "operationId": "getUserChallenges",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "UID",
+            "in": "path",
+            "description": "User ID to retrieve challenges for.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserChallenge"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UID supplied."
+          },
+          "404": {
+            "description": "User Challenges not found."
           }
         }
       }
@@ -239,6 +277,10 @@
           "type": "string",
           "example": "2018/07/16 09:00:00"
         },
+        "activityId": {
+          "type": "integer",
+          "format": "int64"
+        },
         "activity": {
           "$ref": "#/definitions/Activity"
         },
@@ -288,8 +330,8 @@
           "format": "int64"
         },
         "userId": {
-          "type": "integer",
-          "format": "int64"
+          "type": "string",
+          "example": "some-user-id"
         },
         "challengeId": {
           "$ref": "#/definitions/Challenge"

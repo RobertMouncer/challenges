@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
+using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using YourApp.Services;
 using Newtonsoft.Json.Linq;
@@ -16,12 +18,14 @@ namespace challenges.Controllers
     [Authorize(AuthenticationSchemes = "oidc")]
     public class UserChallengesController : Controller
     {
-        private readonly challengesContext _context;
+        private readonly IUserChallengeRepository _userChallengeRepository;
+        private readonly IChallengeRepository _challengeRepository;
         private readonly IApiClient client;
 
-        public UserChallengesController(challengesContext context, IApiClient client)
+        public UserChallengesController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, IApiClient client)
         {
-            _context = context;
+            _userChallengeRepository = userChallengeRepository;
+            _challengeRepository = challengeRepository;
             this.client = client;
         }
 
@@ -34,8 +38,7 @@ namespace challenges.Controllers
             //this if is awful, please change if you have another way, please do
             if (isAdminOrCoord())
             {
-                var challengesContext = _context.UserChallenge.Include(u => u.Challenge)
-                                                                           .Include(a => a.Challenge.Activity);
+                var challengesContext = _userChallengeRepository.GetAll();
                 List<string> userList = new List<string>();
 
                 foreach (UserChallenge u in challengesContext)
@@ -61,10 +64,7 @@ namespace challenges.Controllers
             } else
             
             {
-
-                var challengesContext = _context.UserChallenge.Include(u => u.Challenge)
-                                                           .Include(a => a.Challenge.Activity)
-                                                           .Where(c => c.UserId.Equals(userId));
+                var challengesContext = _userChallengeRepository.GetByUId(userId);
 
                 foreach(var c in challengesContext)
                 {
@@ -77,9 +77,7 @@ namespace challenges.Controllers
 
                 }
 
-                challengesContext = _context.UserChallenge.Include(u => u.Challenge)
-                                                           .Include(a => a.Challenge.Activity)
-                                                           .Where(c => c.UserId.Equals(userId));
+                challengesContext = _userChallengeRepository.GetByUId(userId);
 
                 return View(await challengesContext.ToListAsync());
             }
@@ -91,7 +89,7 @@ namespace challenges.Controllers
         // GET: UserChallenges/Create
         public IActionResult Create()
         {
-            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId");
+            ViewData["ChallengeId"] = new SelectList(_challengeRepository.GetDBSet(), "ChallengeId", "ChallengeId");
             return View();
         }
 
@@ -104,11 +102,10 @@ namespace challenges.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(userChallenge);
-                await _context.SaveChangesAsync();
+                await _userChallengeRepository.AddAsync(userChallenge);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ChallengeId"] = new SelectList(_context.Challenge, "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
+            ViewData["ChallengeId"] = new SelectList(_challengeRepository.GetDBSet(), "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
             return View(userChallenge);
         }
 
@@ -122,9 +119,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var userChallenge = await _context.UserChallenge
-                .Include(u => u.Challenge)
-                .FirstOrDefaultAsync(m => m.UserChallengeId == id);
+            var userChallenge = await _userChallengeRepository.GetByIdAsync((int) id);
             if (userChallenge == null)
             {
                 return NotFound();
@@ -138,15 +133,14 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userChallenge = await _context.UserChallenge.FindAsync(id);
-            _context.UserChallenge.Remove(userChallenge);
-            await _context.SaveChangesAsync();
+            var userChallenge = await _userChallengeRepository.FindByIdAsync(id);
+            await _userChallengeRepository.DeleteAsync(userChallenge);
             return RedirectToAction(nameof(Index));
         }
 
         private bool UserChallengeExists(int id)
         {
-            return _context.UserChallenge.Any(e => e.UserChallengeId == id);
+            return _userChallengeRepository.Exists(id);
         }
 
         public bool isAdminOrCoord()
@@ -192,8 +186,7 @@ namespace challenges.Controllers
             }
             userChallenge.PercentageComplete = percentageComplete;
 
-            _context.Update(userChallenge);
-            await _context.SaveChangesAsync();
+            await _userChallengeRepository.UpdateAsync(userChallenge);
 
             return userChallenge;
         }

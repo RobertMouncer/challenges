@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
+using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using YourApp.Services;
 using Newtonsoft.Json;
@@ -15,12 +17,17 @@ namespace challenges.Controllers
     [Authorize(AuthenticationSchemes = "oidc")]
     public class ChallengesManageController : Controller
     {
-        private readonly challengesContext _context;
+        private readonly IUserChallengeRepository _userChallengeRepository;
+        private readonly IChallengeRepository _challengeRepository;
+        private readonly IActivityRepository _activityRepository;
         private readonly IApiClient client;
 
-        public ChallengesManageController(challengesContext context, IApiClient client)
+        public ChallengesManageController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
+            IActivityRepository activityRepository, IApiClient client)
         {
-            _context = context;
+            _userChallengeRepository = userChallengeRepository;
+            _challengeRepository = challengeRepository;
+            _activityRepository = activityRepository;
             this.client = client;
         }
 
@@ -31,7 +38,7 @@ namespace challenges.Controllers
             
             if (isAdminOrCoord())
             {
-                var challengesContext =  _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge);
+                var challengesContext =  _challengeRepository.GetAllGroup();
 
                 foreach(var c in challengesContext)
                 {
@@ -51,7 +58,7 @@ namespace challenges.Controllers
                 dynamic data = JsonConvert.DeserializeObject(group);
                 string groupId = data.id;
                 //TODO get user group and only display for that group
-                var challengesContext = _context.Challenge.Include(c => c.Activity).Where(c => c.isGroupChallenge && c.Groupid == groupId);
+                var challengesContext = _challengeRepository.GetAllGroupById(groupId);
                 return View(await challengesContext.ToListAsync());
             }
             
@@ -66,9 +73,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var challenge = await _context.Challenge
-                .Include(c => c.Activity)
-                .FirstOrDefaultAsync(m => m.ChallengeId == id);
+            var challenge = await _challengeRepository.GetByIdIncAsync((int) id);
             if (challenge == null)
             {
                 return NotFound();
@@ -85,7 +90,7 @@ namespace challenges.Controllers
             var items = GetGroups(groups);
 
             ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
+            ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
             return View();
         }
@@ -95,7 +100,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,,GoalMetric,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,,GoalMetric,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
@@ -115,24 +120,24 @@ namespace challenges.Controllers
                 ChallengeId = challenge.ChallengeId
             };
 
-            if (isAdminOrCoord() && !challenge.isGroupChallenge)
+            if (isAdminOrCoord() && !challenge.IsGroupChallenge)
             {
-                ModelState.AddModelError("isGroupChallenge","Must be a group challenge.");
+                ModelState.AddModelError("IsGroupChallenge","Must be a group challenge.");
             }
 
 
             if (ModelState.IsValid)
             {
                 
-                _context.Add(challenge);
-                if (!challenge.isGroupChallenge)
+                await _challengeRepository.AddAsync(challenge);
+                if (!challenge.IsGroupChallenge)
                 {
-                    _context.Add(user);
+                    await _userChallengeRepository.AddAsync(user);
                 }
 
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync(); //TODO Tidy
 
-                if (challenge.isGroupChallenge)
+                if (challenge.IsGroupChallenge)
                 {
                     return RedirectToAction("Index", "Challenges");
                 }
@@ -144,7 +149,7 @@ namespace challenges.Controllers
             var items = GetGroups(groups);
 
             ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
+            ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
             return View(challenge);
         }
@@ -158,7 +163,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var challenge = await _context.Challenge.FindAsync(id);
+            var challenge = await _challengeRepository.FindByIdAsync((int) id);
             if (challenge == null)
             {
                 return NotFound();
@@ -170,7 +175,7 @@ namespace challenges.Controllers
 
             ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
 
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
+            ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
             return View(challenge);
         }
@@ -180,7 +185,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetric,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetric,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
@@ -200,9 +205,9 @@ namespace challenges.Controllers
                 ModelState.AddModelError("EndDateTime", "End Date/Time should be after the start Date/Time. Please re-enter Date/Time.");
             }
 
-            if (isAdminOrCoord() && !challenge.isGroupChallenge)
+            if (isAdminOrCoord() && !challenge.IsGroupChallenge)
             {
-                ModelState.AddModelError("isGroupChallenge", "Must be a group challenge");
+                ModelState.AddModelError("IsGroupChallenge", "Must be a group challenge");
             }
 
             if (id != challenge.ChallengeId)
@@ -214,12 +219,12 @@ namespace challenges.Controllers
             {
                 try
                 {
-                    _context.Update(challenge);
-                    if (!challenge.isGroupChallenge)
+                    await _challengeRepository.UpdateAsync(challenge);
+                    if (!challenge.IsGroupChallenge)
                     {
-                        _context.Add(user);
+                        await _userChallengeRepository.AddAsync(user);
                     }
-                    await _context.SaveChangesAsync();
+                    //await _context.SaveChangesAsync(); //TODO Tidy
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -239,7 +244,7 @@ namespace challenges.Controllers
             var items = GetGroups(groups);
 
             ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
-            ViewData["ActivityId"] = new SelectList(_context.Activity, "ActivityId", "ActivityName");
+            ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
 
             return View(challenge);
@@ -253,9 +258,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var challenge = await _context.Challenge
-                .Include(c => c.Activity)
-                .FirstOrDefaultAsync(m => m.ChallengeId == id);
+            var challenge = await _challengeRepository.GetByIdIncAsync((int) id);
             if (challenge == null)
             {
                 return NotFound();
@@ -269,15 +272,14 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var challenge = await _context.Challenge.FindAsync(id);
-            _context.Challenge.Remove(challenge);
-            await _context.SaveChangesAsync();
+            var challenge = await _challengeRepository.FindByIdAsync(id);
+            await _challengeRepository.DeleteAsync(challenge);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ChallengeExists(int id)
         {
-            return _context.Challenge.Any(e => e.ChallengeId == id);
+            return _challengeRepository.Exists(id);
         }
 
         [HttpGet]
@@ -288,7 +290,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-             var challenge = await _context.Challenge.FindAsync(id); ;
+            var challenge = await _challengeRepository.FindByIdAsync((int) id);
             if (challenge == null)
             {
                 return NotFound();
@@ -304,8 +306,8 @@ namespace challenges.Controllers
 
 
             var userId = User.Claims.Single(c => c.Type == "sub").Value;
-            var challenge = await _context.Challenge.FindAsync(id);
-            var userChallenge = _context.UserChallenge.Where(uc => uc.ChallengeId == id && uc.UserId == userId);
+            var challenge = await _challengeRepository.FindByIdAsync(id);
+            var userChallenge = _userChallengeRepository.GetByCid_Uid(userId, id);
             if (userChallenge.Count() > 0) {
                 return RedirectToAction(nameof(Index));
             }
@@ -322,8 +324,7 @@ namespace challenges.Controllers
                 ChallengeId = challenge.ChallengeId
             };
 
-            _context.Add(user);
-            await _context.SaveChangesAsync();
+            await _userChallengeRepository.AddAsync(user);
 
             return RedirectToAction(nameof(Index));
         }

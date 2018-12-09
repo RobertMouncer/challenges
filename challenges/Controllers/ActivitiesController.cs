@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Models;
+using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using YourApp.Services;
 using Newtonsoft.Json;
@@ -17,19 +19,19 @@ namespace challenges.Controllers
     [Authorize(AuthenticationSchemes = "oidc", Policy = "coordinator")]
     public class ActivitiesController : Controller
     {
-        private readonly challengesContext _context;
+        private readonly IActivityRepository _activityRepository;
         private readonly IApiClient client;
 
-        public ActivitiesController(challengesContext context, IApiClient client)
+        public ActivitiesController(IActivityRepository activityRepository, IApiClient client)
         {
-            _context = context;
+            _activityRepository = activityRepository;
             this.client = client;
         }
 
         // GET: Activities
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Activity.ToListAsync());
+            return View(await _activityRepository.GetAllAsync());
         }
 
         // GET: Activities/Details/5
@@ -40,8 +42,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var activity = await _context.Activity
-                .FirstOrDefaultAsync(m => m.ActivityId == id);
+            var activity = await _activityRepository.GetByIdIncAsync((int) id);
             if (activity == null)
             {
                 return NotFound();
@@ -91,8 +92,7 @@ namespace challenges.Controllers
             }
             if (ModelState.IsValid)
             {
-                _context.Add(activity);
-                await _context.SaveChangesAsync();
+                await _activityRepository.AddAsync(activity);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -114,7 +114,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var activity = await _context.Activity.FindAsync(id);
+            var activity = await _activityRepository.FindByIdAsync((int) id);
             if (activity == null)
             {
                 return NotFound();
@@ -148,8 +148,7 @@ namespace challenges.Controllers
             {
                 try
                 {
-                    _context.Update(activity);
-                    await _context.SaveChangesAsync();
+                    await _activityRepository.UpdateAsync(activity);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -181,8 +180,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var activity = await _context.Activity
-                .FirstOrDefaultAsync(m => m.ActivityId == id);
+            var activity = await _activityRepository.GetByIdIncAsync((int) id);
             if (activity == null)
             {
                 return NotFound();
@@ -196,20 +194,19 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var activity = await _context.Activity.FindAsync(id);
-            _context.Activity.Remove(activity);
-            await _context.SaveChangesAsync();
+            var activity = await _activityRepository.FindByIdAsync(id);
+            await _activityRepository.DeleteAsync(activity);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ActivityExists(int id)
         {
-            return _context.Activity.Any(e => e.ActivityId == id);
+            return _activityRepository.Exists(id);
         }
 
         private bool ActivityNameExists(string name)
         {
-            return _context.Activity.Any(e => e.ActivityName == name);
+            return _activityRepository.Exists(name);
         }
 
     }

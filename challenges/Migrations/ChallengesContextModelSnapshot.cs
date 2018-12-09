@@ -3,12 +3,12 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using challenges.Models;
+using challenges.Data;
 
 namespace challenges.Migrations
 {
     [DbContext(typeof(challengesContext))]
-    partial class challengesContextModelSnapshot : ModelSnapshot
+    partial class ChallengesContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -44,11 +44,11 @@ namespace challenges.Migrations
 
                     b.Property<string>("Groupid");
 
+                    b.Property<bool>("IsGroupChallenge");
+
                     b.Property<bool>("Repeat");
 
                     b.Property<DateTime>("StartDateTime");
-
-                    b.Property<bool>("isGroupChallenge");
 
                     b.HasKey("ChallengeId");
 
