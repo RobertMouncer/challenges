@@ -98,6 +98,7 @@ namespace challenges.Controllers
 
             var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
             var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+
             var items = GetActivities(activitiesContent);
 
             ViewData["ActivityName"] = new SelectList(items, "Text", "Text");

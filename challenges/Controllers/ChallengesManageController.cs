@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 namespace challenges.Controllers
 {
     [Authorize(AuthenticationSchemes = "oidc")]
-    public class ChallengesController : Controller
+    public class ChallengesManageController : Controller
     {
         private readonly IUserChallengeRepository _userChallengeRepository;
         private readonly IChallengeRepository _challengeRepository;

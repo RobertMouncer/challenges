@@ -34,6 +34,8 @@ namespace challenges.Controllers
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
+
+            //this if is awful, please change if you have another way, please do
             if (isAdminOrCoord())
             {
                 var challengesContext = _userChallengeRepository.GetAll();
@@ -60,6 +62,7 @@ namespace challenges.Controllers
 
                 return View(await challengesContext.ToListAsync());
             } else
+            
             {
                 var challengesContext = _userChallengeRepository.GetByUId(userId);
 
@@ -69,10 +72,14 @@ namespace challenges.Controllers
                                                         + c.UserId + "?from=" + c.Challenge.StartDateTime.Date + "&to=" + c.Challenge.EndDateTime);
 
                     var userDataResult = userData.Content.ReadAsStringAsync().Result;
-                    
-                    UpdatePercentageCompleteAsync(c, userDataResult);
+
+                    await UpdatePercentageCompleteAsync(c, userDataResult);
+
                 }
-                
+
+                challengesContext = _context.UserChallenge.Include(u => u.Challenge)
+                                                           .Include(a => a.Challenge.Activity)
+                                                           .Where(c => c.UserId.Equals(userId));
 
                 return View(await challengesContext.ToListAsync());
             }
@@ -143,6 +150,7 @@ namespace challenges.Controllers
             return (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator"));
         }
 
+        //this is also awful, please change
         private async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
         {
             dynamic dataString = JsonConvert.DeserializeObject(userDataString);
@@ -173,7 +181,11 @@ namespace challenges.Controllers
                 }
             }
 
-            var percentageComplete = progress / userChallenge.Challenge.Goal;
+            var percentageComplete = (progress / userChallenge.Challenge.Goal)*100;
+            if(percentageComplete > 100)
+            {
+                percentageComplete = 100;
+            }
             userChallenge.PercentageComplete = percentageComplete;
 
             await _userChallengeRepository.UpdateAsync(userChallenge);

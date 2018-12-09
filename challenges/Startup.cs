@@ -36,6 +36,7 @@ namespace challenges
             services.AddScoped<IChallengeRepository, ChallengeRepository>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
 
+            services.AddHttpClient();
             services.AddHttpClient("challengesHttpClient", client => {
             });
             services.AddSingleton<IApiClient, ApiClient>();
@@ -137,7 +138,7 @@ namespace challenges
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Challenges}/{action=Index}/{id?}");
+                    template: "{controller=ChallengesManage}/{action=Index}/{id?}");
             });
         }
 
