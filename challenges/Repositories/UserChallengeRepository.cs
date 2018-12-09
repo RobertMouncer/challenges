@@ -59,15 +59,12 @@ namespace challenges.Repositories
         public async Task<UserChallenge> AddAsync(UserChallenge userChallenge)
         {
             _context.UserChallenge.Add(userChallenge);
-            _context.Entry(userChallenge.Challenge.Activity).State = EntityState.Detached;
             await _context.SaveChangesAsync();
             return userChallenge;
         }
 
         public async Task<UserChallenge> UpdateAsync(UserChallenge userChallenge)
         {
-            userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
-            userChallenge.Challenge.Activity = null;
             _context.UserChallenge.Update(userChallenge);
             await _context.SaveChangesAsync();
             return userChallenge;
@@ -75,7 +72,6 @@ namespace challenges.Repositories
 
         public async Task<UserChallenge> DeleteAsync(UserChallenge userChallenge)
         {
-            _context.Entry(userChallenge.Challenge.Activity).State = EntityState.Detached;
             _context.UserChallenge.Remove(userChallenge);
             await _context.SaveChangesAsync();
             return userChallenge;
