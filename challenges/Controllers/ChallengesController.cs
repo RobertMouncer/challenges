@@ -22,9 +22,12 @@ namespace challenges.Controllers
         private readonly IActivityRepository _activityRepository;
         private readonly IApiClient client;
 
-        public ChallengesController(IChallengeRepository challengeRepository, IApiClient client)
+        public ChallengesController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
+            IActivityRepository activityRepository, IApiClient client)
         {
+            _userChallengeRepository = userChallengeRepository;
             _challengeRepository = challengeRepository;
+            _activityRepository = activityRepository;
             this.client = client;
         }
 
@@ -97,7 +100,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,,GoalMetric,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,,GoalMetric,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
@@ -119,7 +122,7 @@ namespace challenges.Controllers
 
             if (isAdminOrCoord() && !challenge.IsGroupChallenge)
             {
-                ModelState.AddModelError("isGroupChallenge","Must be a group challenge.");
+                ModelState.AddModelError("IsGroupChallenge","Must be a group challenge.");
             }
 
 
@@ -182,7 +185,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetric,Repeat,ActivityId,isGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetric,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
@@ -204,7 +207,7 @@ namespace challenges.Controllers
 
             if (isAdminOrCoord() && !challenge.IsGroupChallenge)
             {
-                ModelState.AddModelError("isGroupChallenge", "Must be a group challenge");
+                ModelState.AddModelError("IsGroupChallenge", "Must be a group challenge");
             }
 
             if (id != challenge.ChallengeId)
