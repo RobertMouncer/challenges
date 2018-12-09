@@ -1,5 +1,7 @@
 using challenges.Controllers.api;
 using challenges.Repositories;
+using challengesTest.TestUtilities;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
@@ -12,6 +14,8 @@ namespace challengesTest.Controllers.api
         private readonly Mock<IChallengeRepository> _challengesRepository;
         private readonly Mock<IActivityRepository> _activityRepository;
 
+        private string testGroupId = "55";
+
         public ChallengesControllerAPI_Test()
         {
             _userChallengeRepository = new Mock<IUserChallengeRepository>();
@@ -22,15 +26,25 @@ namespace challengesTest.Controllers.api
         }
 
         [Fact]
-        public void GetChallenges_ReturnsAllGroupChallenges()
+        public async void GetChallenges_ReturnsAllGroupChallenges()
         {
-            //TODO Implement
+            var challenges = ChallengesGenerator.Create(10, true);
+            _userChallengeRepository.Setup(r => r.GetByGroupIdAsync("55")).ReturnsAsync(challenges).Verifiable();
+            var result = await _controller.ListUserGroupChallenges("55");
+            Assert.IsType<OkObjectResult>(result);
+            _userChallengeRepository.Verify();
+            _userChallengeRepository.VerifyNoOtherCalls();
         }
         
         [Fact]
-        public void GetChalleneg_ReturnsAllUserChallenges()
+        public async void GetChallenges_ReturnsAllUserChallenges()
         {
-            //TODO Implement
+            var challenges = ChallengesGenerator.Create(10, false);
+            _userChallengeRepository.Setup(r => r.GetAllPersonalChallenges("TestUid")).ReturnsAsync(challenges).Verifiable();
+            var result = await _controller.ListPersonalChallenges("TestUid");
+            Assert.IsType<OkObjectResult>(result);
+            _userChallengeRepository.Verify();
+            _userChallengeRepository.VerifyNoOtherCalls();
         }
         
         [Fact]
