@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using challenges.Models;
 
@@ -11,6 +12,8 @@ namespace challenges.Repositories
         Task<List<UserChallenge>> GetAllAsync();
         
         Task<List<UserChallenge>> GetByGroupIdAsync(string groupId);
+
+        IQueryable<UserChallenge> GetByCid_Uid(string userId, int challengeId);
 
         Task<List<UserChallenge>> GetAllPersonalChallenges(string userId);
 

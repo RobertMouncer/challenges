@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using challenges.Data;
 using challenges.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace challenges.Repositories
@@ -18,9 +19,14 @@ namespace challenges.Repositories
         
         public async Task<Challenge> GetByIdAsync(int id)
         {
+            return await _context.Challenge.FindAsync(id);
+        }
+
+        public async Task<Challenge> GetByIdIncAsync(int id)
+        {
             return await _context.Challenge
-                    .Include(b => b.Activity)
-                    .SingleOrDefaultAsync(g => g.ChallengeId == id);
+                .Include(b => b.Activity)
+                .SingleOrDefaultAsync(g => g.ChallengeId == id);
         }
 
         public async Task<List<Challenge>> GetAllAsync()
@@ -28,6 +34,16 @@ namespace challenges.Repositories
             return await _context.Challenge
                     .Include(b => b.Activity)
                     .ToListAsync();
+        }
+
+        public IQueryable<Challenge> GetAllGroup()
+        {
+            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge);
+        }
+
+        public IQueryable<Challenge> GetAllGroupById(string id)
+        {
+            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge && c.Groupid == id);
         }
 
         public async Task<Challenge> AddAsync(Challenge challenge)
@@ -49,6 +65,16 @@ namespace challenges.Repositories
             _context.Challenge.Remove(challenge);
             await _context.SaveChangesAsync();
             return challenge;
+        }
+
+        public DbSet<Challenge> GetDBSet()
+        {
+            return _context.Challenge;
+        }
+
+        public bool Exists(int id)
+        {
+            return _context.Challenge.Any(e => e.ChallengeId == id);
         }
     }
 }

@@ -41,6 +41,11 @@ namespace challenges.Repositories
                 .ToListAsync();
         }
 
+        public IQueryable<UserChallenge> GetByCid_Uid(string userId, int challengeId)
+        {
+            return _context.UserChallenge.Where(uc => uc.ChallengeId == challengeId && uc.UserId == userId);
+        }
+
         public async Task<List<UserChallenge>> GetAllPersonalChallenges(string userId)
         {
             return await _context.UserChallenge
