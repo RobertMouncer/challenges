@@ -39,10 +39,13 @@ namespace challenges.Controllers.api
                 return BadRequest(ModelState);
             }
 
+            userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
             userChallenge.Challenge.Activity = null;
-            await _userChallengeRepository.AddAsync(userChallenge);
-
-            return Ok(userChallenge);
+            var challenge = await _challengeRepository.AddAsync(userChallenge.Challenge);
+            userChallenge.Challenge = null;
+            userChallenge.ChallengeId = challenge.ChallengeId;
+            var user = await _userChallengeRepository.AddAsync(userChallenge);
+            return Ok(user);
         }
 
         [HttpGet("find/{ugid}")]
