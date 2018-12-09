@@ -22,7 +22,7 @@ namespace challenges.Controllers
         private readonly IActivityRepository _activityRepository;
         private readonly IApiClient client;
 
-        public ChallengesController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
+        public ChallengesManageController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
             IActivityRepository activityRepository, IApiClient client)
         {
             _userChallengeRepository = userChallengeRepository;

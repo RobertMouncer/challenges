@@ -77,9 +77,7 @@ namespace challenges.Controllers
 
                 }
 
-                challengesContext = _context.UserChallenge.Include(u => u.Challenge)
-                                                           .Include(a => a.Challenge.Activity)
-                                                           .Where(c => c.UserId.Equals(userId));
+                challengesContext = _userChallengeRepository.GetByUId(userId);
 
                 return View(await challengesContext.ToListAsync());
             }
