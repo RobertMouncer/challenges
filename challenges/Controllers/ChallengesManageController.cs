@@ -56,9 +56,13 @@ namespace challenges.Controllers
                 var groupResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups/ForUser/" + userId);
                 var group = groupResponse.Content.ReadAsStringAsync().Result;
                 dynamic data = JsonConvert.DeserializeObject(group);
-                string groupId = data.id;
-                //TODO get user group and only display for that group
-                var challengesContext = _challengeRepository.GetAllGroupById(groupId);
+                string groupId;
+                if (data != null)
+                    groupId = data.id;
+                else
+                    groupId = "NOTHING";
+                 //TODO get user group and only display for that group
+                 var challengesContext = _challengeRepository.GetAllGroupById(groupId);
                 return View(await challengesContext.ToListAsync());
             }
             
@@ -139,7 +143,7 @@ namespace challenges.Controllers
 
                 if (challenge.IsGroupChallenge)
                 {
-                    return RedirectToAction("Index", "Challenges");
+                    return RedirectToAction("Index", "ChallengesManage");
                 }
                 return RedirectToAction("Index", "UserChallenges");
             }
