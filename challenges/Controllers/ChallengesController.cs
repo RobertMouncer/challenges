@@ -163,7 +163,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var challenge = await _challengeRepository.GetByIdAsync((int) id);
+            var challenge = await _challengeRepository.FindByIdAsync((int) id);
             if (challenge == null)
             {
                 return NotFound();
@@ -272,7 +272,7 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var challenge = await _challengeRepository.GetByIdAsync(id);
+            var challenge = await _challengeRepository.FindByIdAsync(id);
             await _challengeRepository.DeleteAsync(challenge);
             return RedirectToAction(nameof(Index));
         }
@@ -290,7 +290,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var challenge = await _challengeRepository.GetByIdAsync((int) id);
+            var challenge = await _challengeRepository.FindByIdAsync((int) id);
             if (challenge == null)
             {
                 return NotFound();
@@ -306,7 +306,7 @@ namespace challenges.Controllers
 
 
             var userId = User.Claims.Single(c => c.Type == "sub").Value;
-            var challenge = await _challengeRepository.GetByIdAsync(id);
+            var challenge = await _challengeRepository.FindByIdAsync(id);
             var userChallenge = _userChallengeRepository.GetByCid_Uid(userId, id);
             if (userChallenge.Count() > 0) {
                 return RedirectToAction(nameof(Index));

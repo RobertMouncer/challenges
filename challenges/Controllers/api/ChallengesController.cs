@@ -38,7 +38,8 @@ namespace challenges.Controllers.api
             {
                 return BadRequest(ModelState);
             }
-            
+
+            userChallenge.Challenge.Activity = null;
             await _userChallengeRepository.AddAsync(userChallenge);
 
             return Ok(userChallenge);
@@ -81,6 +82,7 @@ namespace challenges.Controllers.api
                 return BadRequest(ModelState);
             }
 
+            userChallenge.Challenge.Activity = null;
             await _userChallengeRepository.UpdateAsync(userChallenge);
 
             return Ok(userChallenge);
@@ -93,6 +95,7 @@ namespace challenges.Controllers.api
             if (userChallenge == null)
                 return NotFound();
 
+            userChallenge.Challenge.Activity = null;
             await _challengeRepository.DeleteAsync(userChallenge.Challenge);
             //await _userChallengeRepository.DeleteAsync(userChallenge);
             return Ok(userChallenge);
@@ -103,7 +106,7 @@ namespace challenges.Controllers.api
             if (userChallenge.Challenge.IsGroupChallenge)
                 ModelState.AddModelError("IsGroupChallenge", "Invalid userChallenge, must be a personal challenge.");
 
-            var activity = await _activityRepository.GetByIdAsync(userChallenge.Challenge.Activity.ActivityId);
+            var activity = await _activityRepository.FindByIdAsync(userChallenge.Challenge.Activity.ActivityId);
             if (activity == null)
                 ModelState.AddModelError("activityId", "Invalid Activity id received, activity doesn't exist.");
         }

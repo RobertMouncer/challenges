@@ -113,7 +113,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var activity = await _activityRepository.GetByIdAsync((int) id);
+            var activity = await _activityRepository.FindByIdAsync((int) id);
             if (activity == null)
             {
                 return NotFound();
@@ -193,7 +193,7 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var activity = await _activityRepository.GetByIdAsync(id);
+            var activity = await _activityRepository.FindByIdAsync(id);
             await _activityRepository.DeleteAsync(activity);
             return RedirectToAction(nameof(Index));
         }

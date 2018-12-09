@@ -17,7 +17,7 @@ namespace challenges.Repositories
             _context = context;
         }
         
-        public async Task<Challenge> GetByIdAsync(int id)
+        public async Task<Challenge> FindByIdAsync(int id)
         {
             return await _context.Challenge.FindAsync(id);
         }

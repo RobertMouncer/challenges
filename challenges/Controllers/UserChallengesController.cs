@@ -128,7 +128,7 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userChallenge = await _userChallengeRepository.FindById(id);
+            var userChallenge = await _userChallengeRepository.FindByIdAsync(id);
             await _userChallengeRepository.DeleteAsync(userChallenge);
             return RedirectToAction(nameof(Index));
         }

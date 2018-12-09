@@ -8,7 +8,7 @@ namespace challenges.Repositories
 {
     public interface IChallengeRepository
     {
-        Task<Challenge> GetByIdAsync(int id);
+        Task<Challenge> FindByIdAsync(int id);
 
         Task<Challenge> GetByIdIncAsync(int id);
 
