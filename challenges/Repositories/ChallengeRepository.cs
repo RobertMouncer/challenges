@@ -36,14 +36,14 @@ namespace challenges.Repositories
                     .ToListAsync();
         }
 
-        public IQueryable<Challenge> GetAllGroup()
+        public Task<List<Challenge>> GetAllGroup()
         {
-            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge);
+            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge).ToListAsync();
         }
 
-        public IQueryable<Challenge> GetAllByGroupId(string id)
+        public Task<List<Challenge>> GetAllByGroupId(string id)
         {
-            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge && c.Groupid == id);
+            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge && c.Groupid == id).ToListAsync();
         }
 
         public async Task<Challenge> AddAsync(Challenge challenge)

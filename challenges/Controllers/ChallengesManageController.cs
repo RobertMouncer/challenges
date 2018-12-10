@@ -38,7 +38,7 @@ namespace challenges.Controllers
             
             if (isAdminOrCoord())
             {
-                var challengesContext =  _challengeRepository.GetAllGroup();
+                var challengesContext = await _challengeRepository.GetAllGroup();
 
                 foreach(var c in challengesContext)
                 {
@@ -48,7 +48,7 @@ namespace challenges.Controllers
                     c.Groupid = data.name;
                 }
 
-                return View(await challengesContext.ToListAsync());
+                return View(challengesContext);
             }
             else
             {
@@ -63,7 +63,7 @@ namespace challenges.Controllers
                     groupId = "NOTHING";
                  //TODO get user group and only display for that group
                  var challengesContext = _challengeRepository.GetAllByGroupId(groupId);
-                return View(await challengesContext.ToListAsync());
+                return View(await challengesContext);
             }
             
 
@@ -311,7 +311,8 @@ namespace challenges.Controllers
 
             var userId = User.Claims.Single(c => c.Type == "sub").Value;
             var challenge = await _challengeRepository.FindByIdAsync(id);
-            var userChallenge = _userChallengeRepository.GetByCid_Uid(userId, id);
+            var userChallenge = await _userChallengeRepository.GetByCid_Uid(userId, id);
+
             if (userChallenge.Count() > 0) {
                 return RedirectToAction(nameof(Index));
             }
