@@ -51,7 +51,7 @@ namespace challenges.Controllers.api
         [HttpGet("getGroup/{uid}")]
         public IActionResult ListUserGroupChallenges([FromRoute] string uid)
         {
-            var userChallenges = _userChallengeRepository.GetGroupByUid(uid);
+            var userChallenges = await _userChallengeRepository.GetGroupByUid(uid);
 
             if (userChallenges == null)
                 return Ok(new List<object>());
