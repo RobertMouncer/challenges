@@ -52,12 +52,12 @@ namespace challenges.Repositories
                 .Where(c => c.UserId.Equals(userId));
         }
 
-        public async Task<List<UserChallenge>> GetByGroupIdAsync(string groupId)
+        public async Task<List<UserChallenge>> GetGroupByUid(string userId)
         {
             return await _context.UserChallenge
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
-                .Where(m => m.Challenge.Groupid == groupId)
+                .Where(m => m.Challenge.IsGroupChallenge && m.UserId == userId)
                 .ToListAsync();
         }
 

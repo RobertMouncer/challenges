@@ -48,24 +48,24 @@ namespace challenges.Controllers.api
             return Ok(user);
         }
 
-        [HttpGet("find/{ugid}")]
-        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] string ugid)
+        [HttpGet("getGroup/{uid}")]
+        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] string uid)
         {
-            var userChallenges = await _userChallengeRepository.GetByGroupIdAsync(ugid);
+            var userChallenges = await _userChallengeRepository.GetGroupByUid(uid);
 
             if (userChallenges == null)
-                return NotFound();
+                return Ok(new List<object>());
             
             return Ok(userChallenges);
         }
 
-        [HttpGet("fromUser/{uid}")]
+        [HttpGet("getPersonal/{uid}")]
         public async Task<IActionResult> ListPersonalChallenges([FromRoute] string uid)
         {
             var userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
 
             if (userChallenges == null)
-                return NotFound();
+                return Ok(new List<object>());
 
             return Ok(userChallenges);
         }
