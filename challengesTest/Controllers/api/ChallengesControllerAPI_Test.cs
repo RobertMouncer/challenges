@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using challenges.Controllers.api;
+using challenges.Models;
 using challenges.Repositories;
 using challengesTest.TestUtilities;
 using Microsoft.AspNetCore.Mvc;
@@ -26,9 +28,9 @@ namespace challengesTest.Controllers.api
         }
 
         [Fact]
-        public async void GetChallenges_ReturnsAllGroupChallenges()
+        public async void ListUserGroupChallenges_ReturnsAllGroupChallenges()
         {
-            var challenges = ChallengesGenerator.Create(10, true);
+            var challenges = ChallengesGenerator.CreateList(10, true);
             _userChallengeRepository.Setup(r => r.GetByGroupIdAsync("55")).ReturnsAsync(challenges).Verifiable();
             var result = await _controller.ListUserGroupChallenges("55");
             Assert.IsType<OkObjectResult>(result);
@@ -37,9 +39,9 @@ namespace challengesTest.Controllers.api
         }
         
         [Fact]
-        public async void GetChallenges_ReturnsAllUserChallenges()
+        public async void ListPersonalChallenges_ReturnsAllUserChallenges()
         {
-            var challenges = ChallengesGenerator.Create(10, false);
+            var challenges = ChallengesGenerator.CreateList(10, false);
             _userChallengeRepository.Setup(r => r.GetAllPersonalChallenges("TestUid")).ReturnsAsync(challenges).Verifiable();
             var result = await _controller.ListPersonalChallenges("TestUid");
             Assert.IsType<OkObjectResult>(result);
@@ -48,33 +50,119 @@ namespace challengesTest.Controllers.api
         }
         
         [Fact]
-        public void PutChallenge_ReturnsBadRequest()
+        public async void UpdateChallenge_ReturnsBadRequest()
         {
-            //TODO Implement
+            var userChallenge = ChallengesGenerator.CreateInvalidChallenge();
+            _activityRepository.Setup(r => r.FindByIdAsync(3)).ReturnsAsync((Activity) null).Verifiable();
+            var result = await _controller.UpdateChallenge(5, userChallenge);
+            
+            Assert.IsType<BadRequestObjectResult>(result);
+            var content = result as BadRequestObjectResult;
+            Assert.IsType<SerializableError>(content.Value);
+            var errors = content.Value as SerializableError;
+
+            var errorKeys = new[] { "Id", "activityId", "IsGroupChallenge"};
+
+            foreach (var key in errorKeys)
+            {
+                Assert.True(errors.ContainsKey(key), $"Should have {key} error");
+            }
+            _activityRepository.Verify();
+            _activityRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void PutChallenges_Updates()
+        public async void UpdateChallenge_Updates()
         {
-            //TODO Implement
+            var userChallenge = ChallengesGenerator.CreateUserChallengePersonal(2);
+            var activity = ActivitiesGenerator.CreateActivity(userChallenge.Challenge.Activity.ActivityId);
+            _activityRepository.Setup(c => c.FindByIdAsync(userChallenge.Challenge.Activity.ActivityId)).ReturnsAsync(activity).Verifiable();
+            _userChallengeRepository.Setup(uc => uc.UpdateAsync(userChallenge)).ReturnsAsync(userChallenge).Verifiable();
+
+            var result = await _controller.UpdateChallenge(userChallenge.UserChallengeId, userChallenge);
+            Assert.IsType<OkObjectResult>(result);
+            var content = result as OkObjectResult;
+            Assert.IsType<UserChallenge>(content.Value);
+            Assert.Equal(userChallenge, content.Value);
+            /*_activityRepository.Verify();
+            _activityRepository.VerifyNoOtherCalls();*/
+            _userChallengeRepository.Verify();
+            _userChallengeRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void PostChallenge_CreatedActivity()
+        public async void NewChallenge_BadRequestResponse()
         {
-            //TODO Implement
+            var userChallenge = ChallengesGenerator.CreateInvalidChallenge();
+            _activityRepository.Setup(r => r.FindByIdAsync(3)).ReturnsAsync((Activity) null).Verifiable();
+            var result = await _controller.NewChallenge(userChallenge);
+            
+            Assert.IsType<BadRequestObjectResult>(result);
+            var content = result as BadRequestObjectResult;
+            Assert.IsType<SerializableError>(content.Value);
+            var errors = content.Value as SerializableError;
+
+            var errorKeys = new[] {"activityId", "IsGroupChallenge"};
+
+            foreach (var key in errorKeys)
+            {
+                Assert.True(errors.ContainsKey(key), $"Should have {key} error");
+            }
+            _activityRepository.Verify();
+            _activityRepository.VerifyNoOtherCalls();
+        }
+        
+        [Fact]
+        public async void NewChallenge_CreatedActivity()
+        {
+            var userChallenge = ChallengesGenerator.CreateUserChallengePersonal(2);
+            var activity = ActivitiesGenerator.CreateActivity(userChallenge.Challenge.Activity.ActivityId);
+            _activityRepository.Setup(a => a.FindByIdAsync(userChallenge.Challenge.Activity.ActivityId)).ReturnsAsync(activity).Verifiable();
+            _challengesRepository.Setup(c => c.AddAsync(userChallenge.Challenge)).ReturnsAsync(userChallenge.Challenge).Verifiable();
+            _userChallengeRepository.Setup(uc => uc.AddAsync(userChallenge)).ReturnsAsync(userChallenge).Verifiable();
+
+            var result = await _controller.NewChallenge(userChallenge);
+            Assert.IsType<OkObjectResult>(result);
+            var content = result as OkObjectResult;
+            Assert.IsType<UserChallenge>(content.Value);
+            Assert.Equal(userChallenge, content.Value);
+            /*_activityRepository.Verify();
+            _activityRepository.VerifyNoOtherCalls();*/
+            _challengesRepository.Verify();
+            _challengesRepository.VerifyNoOtherCalls();
+            _userChallengeRepository.Verify();
+            _userChallengeRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void DeleteChallenge_ReturnsNotFound()
+        public void DeleteUserChallenge_ReturnsNotFound()
         {
-            //TODO Implement
+            int id = 1;
+            _userChallengeRepository.Setup(uc => uc.GetByIdAsync(1)).ReturnsAsync((UserChallenge)null).Verifiable();
+
+            var result = _controller.DeleteUserChallenge(id);
+            Assert.IsType<NotFoundResult>(result.Result);
+            
+            _userChallengeRepository.Verify();
+            _userChallengeRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void DeleteChallenge_RemovesChallenge()
+        public async void DeleteUserChallenge_RemovesChallenge()
         {
-            //TODO Implement
+            var userChallenge = ChallengesGenerator.CreateUserChallengePersonal(1);
+            _userChallengeRepository.Setup(uc => uc.GetByIdAsync(userChallenge.UserChallengeId)).ReturnsAsync(userChallenge).Verifiable();
+            _challengesRepository.Setup(uc => uc.DeleteAsync(userChallenge.Challenge)).ReturnsAsync(userChallenge.Challenge).Verifiable();
+
+            var result = await _controller.DeleteUserChallenge(userChallenge.UserChallengeId);
+            Assert.IsType<OkObjectResult>(result);
+            var content = result as OkObjectResult;
+            Assert.IsType<UserChallenge>(content.Value);
+            Assert.Equal(userChallenge, content.Value);
+            _challengesRepository.Verify();
+            _challengesRepository.VerifyNoOtherCalls();
+            _userChallengeRepository.Verify();
+            _userChallengeRepository.VerifyNoOtherCalls();
         }
     }
 }

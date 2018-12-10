@@ -7,7 +7,7 @@ namespace challengesTest.TestUtilities
 {
     public static class ChallengesGenerator
     {
-        public static List<UserChallenge> Create(int quantity, bool group_id)
+        public static List<UserChallenge> CreateList(int quantity, bool group_id)
         {
             List<UserChallenge> list = new List<UserChallenge>();
             for (var i = 0; i < quantity; i++)
@@ -18,34 +18,31 @@ namespace challengesTest.TestUtilities
             return list;
         }
 
-        public static UserChallenge CreateChallenge(int id, string groupId)
+        public static UserChallenge CreateInvalidChallenge()
         {
-            var aId = 10 + id;
-            var cId = 20 + id;
-            var uId = 30 + id;
             return new UserChallenge
             {
-                UserChallengeId = uId,
+                UserChallengeId = 1,
                 UserId = "TestUid",
                 Challenge = new Challenge
                 {
-                    ChallengeId = cId,
+                    ChallengeId = 2,
                     StartDateTime = new DateTime().Add(TimeSpan.FromDays(1)),
                     EndDateTime = new DateTime().Add(TimeSpan.FromDays(2)),
-                    Goal = 1000 + cId,
+                    Goal = 1000,
                     GoalMetric = "TestGoalMetric",
                     Repeat = false,
                     Activity = new Activity
                     {
-                        ActivityId = aId,
-                        ActivityName = "TestActivityName" + aId
+                        ActivityId = 3,
+                        ActivityName = "TestActivityName"
                     },
-                    ActivityId = aId,
-                    IsGroupChallenge = ((id % 2) == 0),
-                    Groupid = groupId
+                    ActivityId = 3,
+                    IsGroupChallenge = true,
+                    Groupid = "7"
                 },
                 PercentageComplete = 0,
-                ChallengeId = cId
+                ChallengeId = 2
             };
         }
 
