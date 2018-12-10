@@ -104,7 +104,7 @@
         }
       }
     },
-    "/challenge/find/{UGID}": {
+    "/challenge/getGroup/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
@@ -116,9 +116,9 @@
         ],
         "parameters": [
           {
-            "name": "UGID",
+            "name": "UID",
             "in": "path",
-            "description": "UserGroupId to retrieve challenges for.",
+            "description": "UserId to retrieve group challenges for.",
             "required": true,
             "type": "integer",
             "format": "int64"
@@ -143,7 +143,7 @@
         }
       }
     },
-    "/challenge/fromUser/{UID}": {
+    "/challenge/getPersonal/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
