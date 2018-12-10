@@ -100,7 +100,6 @@ namespace challenges.Controllers.api
 
             userChallenge.Challenge.Activity = null;
             await _challengeRepository.DeleteAsync(userChallenge.Challenge);
-            //await _userChallengeRepository.DeleteAsync(userChallenge);
             return Ok(userChallenge);
         }
 
