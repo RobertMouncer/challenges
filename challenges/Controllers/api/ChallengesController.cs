@@ -14,7 +14,7 @@ namespace challenges.Controllers.api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
     public class ChallengesController : ControllerBase
     {
         private readonly IChallengeRepository _challengeRepository;
@@ -48,10 +48,10 @@ namespace challenges.Controllers.api
             return Ok(user);
         }
 
-        [HttpGet("find/{ugid}")]
-        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] string ugid)
+        [HttpGet("getGroup/{uid}")]
+        public IActionResult ListUserGroupChallenges([FromRoute] string uid)
         {
-            var userChallenges = await _userChallengeRepository.GetByGroupIdAsync(ugid);
+            var userChallenges = _userChallengeRepository.GetGroupByUid(uid);
 
             if (userChallenges == null)
                 return Ok(new List<object>());
@@ -59,7 +59,7 @@ namespace challenges.Controllers.api
             return Ok(userChallenges);
         }
 
-        [HttpGet("fromUser/{uid}")]
+        [HttpGet("getPersonal/{uid}")]
         public async Task<IActionResult> ListPersonalChallenges([FromRoute] string uid)
         {
             var userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);

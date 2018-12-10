@@ -62,7 +62,7 @@ namespace challenges.Controllers
                 else
                     groupId = "NOTHING";
                  //TODO get user group and only display for that group
-                 var challengesContext = _challengeRepository.GetAllGroupById(groupId);
+                 var challengesContext = _challengeRepository.GetAllByGroupId(groupId);
                 return View(await challengesContext.ToListAsync());
             }
             

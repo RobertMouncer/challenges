@@ -41,7 +41,7 @@ namespace challenges.Repositories
             return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge);
         }
 
-        public IQueryable<Challenge> GetAllGroupById(string id)
+        public IQueryable<Challenge> GetAllByGroupId(string id)
         {
             return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge && c.Groupid == id);
         }
