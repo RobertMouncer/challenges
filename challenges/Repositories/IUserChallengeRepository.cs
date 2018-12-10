@@ -18,7 +18,7 @@ namespace challenges.Repositories
 
         IQueryable<UserChallenge> GetByUId(string userId);
         
-        Task<List<UserChallenge>> GetByGroupIdAsync(string groupId);
+        Task<List<UserChallenge>> GetGroupByUid(string userId);
 
         IQueryable<UserChallenge> GetByCid_Uid(string userId, int challengeId);
 
