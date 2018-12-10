@@ -54,7 +54,7 @@ namespace challenges.Controllers.api
             var userChallenges = await _userChallengeRepository.GetByGroupIdAsync(ugid);
 
             if (userChallenges == null)
-                return NotFound();
+                return Ok(new List<object>());
             
             return Ok(userChallenges);
         }
@@ -65,7 +65,7 @@ namespace challenges.Controllers.api
             var userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
 
             if (userChallenges == null)
-                return NotFound();
+                return Ok(new List<object>());
 
             return Ok(userChallenges);
         }
