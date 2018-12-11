@@ -160,8 +160,9 @@ namespace challenges.Controllers
                 var activityTypeId = d.activityTypeId;
                 if (activityTypeId == userChallenge.Challenge.Activity.DbActivityId)
                 {
-                    switch (userChallenge.Challenge.GoalMetric)
+                    switch (userChallenge.Challenge.GoalMetric.GoalMetricDbName)
                     {
+                        //TODO CHANGE THIS TO BE NICER
                         case "CaloriesBurnt":
                             progress += (int)d.caloriesBurnt;
                             break;

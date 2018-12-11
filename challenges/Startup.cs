@@ -35,6 +35,7 @@ namespace challenges
             services.AddScoped<IUserChallengeRepository, UserChallengeRepository>();
             services.AddScoped<IChallengeRepository, ChallengeRepository>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<IGoalMetricRepository, GoalMetricRepository>();
 
             services.AddHttpClient();
             services.AddHttpClient("challengesHttpClient", client => {

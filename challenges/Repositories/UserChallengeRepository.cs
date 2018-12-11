@@ -26,6 +26,7 @@ namespace challenges.Repositories
         public async Task<UserChallenge> GetByIdAsync(int id)
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .SingleOrDefaultAsync(g => g.UserChallengeId == id);
@@ -34,6 +35,7 @@ namespace challenges.Repositories
         public async Task<List<UserChallenge>> GetAllAsync()
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .ToListAsync();
@@ -41,7 +43,7 @@ namespace challenges.Repositories
 
         public async Task<List<UserChallenge>> GetByUId(string userId)
         {
-            return await _context.UserChallenge.Include(u => u.Challenge)
+            return await _context.UserChallenge.Include(u => u.Challenge).Include(c => c.Challenge.GoalMetric)
                 .Include(a => a.Challenge.Activity)
                 .Where(c => c.UserId.Equals(userId)).ToListAsync();
         }
@@ -49,6 +51,7 @@ namespace challenges.Repositories
         public async Task<List<UserChallenge>> GetGroupByUid(string userId)
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .Where(m => m.Challenge.IsGroupChallenge && m.UserId == userId)
@@ -63,6 +66,7 @@ namespace challenges.Repositories
         public async Task<List<UserChallenge>> GetAllPersonalChallenges(string userId)
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .Where(m => m.UserId == userId)
