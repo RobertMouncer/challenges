@@ -294,10 +294,7 @@
         },
         "activity": {
           "$ref": "#/definitions/Activity"
-        },
-        "repeat": {
-          "type": "boolean"
-        },
+        },        
         "isGroupChallenge": {
           "type": "boolean"
         },
