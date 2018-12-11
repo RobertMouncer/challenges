@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace challenges.Controllers.api
 {
-    [Route("api/[controller]")]
+    [Route("api/challengesManage")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "Bearer")]
     public class ChallengesController : ControllerBase
@@ -33,18 +33,23 @@ namespace challenges.Controllers.api
         public async Task<IActionResult> NewChallenge([FromBody] UserChallenge userChallenge)
         {
             await ValidateUserChallenge(userChallenge);
-            
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
+            //userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
+
             userChallenge.Challenge.Activity = null;
+
             var challenge = await _challengeRepository.AddAsync(userChallenge.Challenge);
+
             userChallenge.Challenge = null;
             userChallenge.ChallengeId = challenge.ChallengeId;
+
             var user = await _userChallengeRepository.AddAsync(userChallenge);
+
             return Ok(user);
         }
 
@@ -108,7 +113,10 @@ namespace challenges.Controllers.api
             if (userChallenge.Challenge.IsGroupChallenge)
                 ModelState.AddModelError("IsGroupChallenge", "Invalid userChallenge, must be a personal challenge.");
 
-            var activity = await _activityRepository.FindByIdAsync(userChallenge.Challenge.Activity.ActivityId);
+            var challenge = userChallenge.Challenge;
+            var activityId = challenge.Activity != null ? challenge.Activity.ActivityId : challenge.ActivityId;
+
+            var activity = await _activityRepository.FindByIdAsync(activityId);
             if (activity == null)
                 ModelState.AddModelError("activityId", "Invalid Activity id received, activity doesn't exist.");
         }
