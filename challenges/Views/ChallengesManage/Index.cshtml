@@ -31,9 +31,6 @@
                         @Html.DisplayNameFor(model => model.GoalMetric.GoalMetricDisplay)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Repeat)
-                    </th>
-                    <th>
                         @Html.DisplayNameFor(model => model.Activity)
                     </th>
                     @if (isAdminOrCoordinator)
@@ -61,15 +58,7 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.GoalMetric.GoalMetricDisplay)
                         </td>
-                        <td>
-                            @if (item.Repeat)
-                            {
-                                <span class="text-success"><i class="fa fa-check"></i></span>
-                            } else
-                            {
-                                <span class="text-primary"><i class="fa fa-times"></i></span>
-                            }
-                        </td>
+                       
                         <td>
                             @Html.DisplayFor(modelItem => item.Activity.ActivityName)
                         </td>
