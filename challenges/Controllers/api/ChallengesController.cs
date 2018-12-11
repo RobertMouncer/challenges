@@ -33,18 +33,23 @@ namespace challenges.Controllers.api
         public async Task<IActionResult> NewChallenge([FromBody] UserChallenge userChallenge)
         {
             await ValidateUserChallenge(userChallenge);
-            
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
-            userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+
+            //userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
+
             userChallenge.Challenge.Activity = null;
+
             var challenge = await _challengeRepository.AddAsync(userChallenge.Challenge);
+
             userChallenge.Challenge = null;
             userChallenge.ChallengeId = challenge.ChallengeId;
+
             var user = await _userChallengeRepository.AddAsync(userChallenge);
+
             return Ok(user);
         }
 

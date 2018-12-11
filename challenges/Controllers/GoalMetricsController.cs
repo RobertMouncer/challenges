@@ -7,22 +7,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using challenges.Data;
 using challenges.Models;
+using Microsoft.AspNetCore.Authorization;
+using challenges.Repositories;
 
 namespace challenges.Controllers
 {
+    [Authorize(AuthenticationSchemes = "oidc", Policy = "coordinator")]
     public class GoalMetricsController : Controller
     {
-        private readonly challengesContext _context;
+        private readonly IGoalMetricRepository _GoalMetricRepository;
 
-        public GoalMetricsController(challengesContext context)
+        public GoalMetricsController(IGoalMetricRepository GoalMetricRepository)
         {
-            _context = context;
+            _GoalMetricRepository = GoalMetricRepository;
         }
 
         // GET: GoalMetrics
         public async Task<IActionResult> Index()
         {
-            return View(await _context.GoalMetric.ToListAsync());
+            return View(await _GoalMetricRepository.GetAllAsync());
         }
 
         // GET: GoalMetrics/Create
@@ -41,8 +44,7 @@ namespace challenges.Controllers
             //TODO CHECK IT DOESN'T ALREADY EXIST
             if (ModelState.IsValid)
             {
-                _context.Add(goalMetric);
-                await _context.SaveChangesAsync();
+                await _GoalMetricRepository.AddAsync(goalMetric);
                 return RedirectToAction(nameof(Index));
             }
             return View(goalMetric);
@@ -56,7 +58,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var goalMetric = await _context.GoalMetric.FindAsync(id);
+            var goalMetric = await _GoalMetricRepository.FindByIdAsync(id);
             if (goalMetric == null)
             {
                 return NotFound();
@@ -80,12 +82,12 @@ namespace challenges.Controllers
             {
                 try
                 {
-                    _context.Update(goalMetric);
-                    await _context.SaveChangesAsync();
+                    await _GoalMetricRepository.UpdateAsync(goalMetric);
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!GoalMetricExists(goalMetric.GoalMetricId))
+                    if (!_GoalMetricRepository.GoalMetricExists(goalMetric.GoalMetricId))
                     {
                         return NotFound();
                     }
@@ -107,8 +109,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var goalMetric = await _context.GoalMetric
-                .FirstOrDefaultAsync(m => m.GoalMetricId == id);
+            var goalMetric = await _GoalMetricRepository.FindByIdAsync(id);
             if (goalMetric == null)
             {
                 return NotFound();
@@ -122,15 +123,10 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var goalMetric = await _context.GoalMetric.FindAsync(id);
-            _context.GoalMetric.Remove(goalMetric);
-            await _context.SaveChangesAsync();
+            var goalMetric = await _GoalMetricRepository.FindByIdAsync(id);
+            await _GoalMetricRepository.DeleteAsync(goalMetric);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool GoalMetricExists(int id)
-        {
-            return _context.GoalMetric.Any(e => e.GoalMetricId == id);
-        }
     }
 }
