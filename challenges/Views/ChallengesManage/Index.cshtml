@@ -1,92 +1,99 @@
 ﻿@model IEnumerable<challenges.Models.Challenge>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Challenges Index";
     var userId = User.Claims.Single(c => c.Type == "sub").Value;
     var isAdminOrCoordinator = User.HasClaim("user_type", "administrator") || User.HasClaim("user_type", "coordinator");
 
 }
 
-<h2>Index</h2>
-
-<p>
-    @if (isAdminOrCoordinator)
-    {
-        <a asp-action="Create">Create New Group Challenge</a>
-    }
-    </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Goal)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GoalMetric.GoalMetricDisplay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Repeat)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Activity)
-            </th>
-            @if (isAdminOrCoordinator)
-            {
-                <th>
-                    @Html.DisplayNameFor(model => model.Groupid)
-                </th>
-            }
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Goal)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GoalMetric.GoalMetricDisplay)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Repeat)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Activity.ActivityId)
-            </td>
-            @if (isAdminOrCoordinator)
-            {
-                <td>
-                    @Html.DisplayFor(modelItem => item.Groupid)
-                </td>
-            }
-            <td>
-                @if (isAdminOrCoordinator)
+<div class="card">
+    <div class="card-header">
+        <strong class="card-title">Manage Challenges</strong>
+        @if (isAdminOrCoordinator)
+        {
+            <a asp-action="Create" class="btn btn-success btn-sm">Create New Group Challenge</a>
+        }
+    </div>
+    <div class="table-stats order-table ov-h">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StartDateTime)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.EndDateTime)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Goal)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.GoalMetric.GoalMetricDisplay)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Repeat)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Activity)
+                    </th>
+                    @if (isAdminOrCoordinator)
+                    {
+                        <th>
+                            @Html.DisplayNameFor(model => model.Groupid)
+                        </th>
+                    }
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
                 {
-                    <a asp-action="Edit" asp-route-id="@item.ChallengeId">Edit</a>
-                    @:|
-                    <a asp-action="Delete" asp-route-id="@item.ChallengeId">Delete</a>
-                }
-                else
-                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.StartDateTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EndDateTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Goal)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.GoalMetric.GoalMetricDisplay)
+                        </td>
+                        <td>
+                            @if (item.Repeat)
+                            {
+                                <span class="text-success"><i class="fa fa-check"></i></span>
+                            } else
+                            {
+                                <span class="text-primary"><i class="fa fa-times"></i></span>
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Activity.ActivityName)
+                        </td>
+                        @if (isAdminOrCoordinator)
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Groupid)
+                            </td>
+                        }
+                        <td>
+                            @if (isAdminOrCoordinator)
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.ChallengeId" class="btn btn-info">Edit</a>                               
+                                <a asp-action="Delete" asp-route-id="@item.ChallengeId" class="btn btn-danger">Delete</a>
+                            }
+                            else
+                            {
 
-                    <a asp-action="Join" asp-route-id="@item.ChallengeId">Join</a>
+                                <a asp-action="Join" asp-route-id="@item.ChallengeId">Join</a>
+                            }
+                        </td>
+                    </tr>
                 }
-
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+            </tbody>
+        </table>
+    </div>
+</div>

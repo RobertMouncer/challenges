@@ -1,63 +1,28 @@
 ﻿@model challenges.Models.Challenge
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Join Challenge";
 }
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <strong class="card-title">Join challenge</strong>
+            </div>
+            <div class="card-body">
 
-<h2>Join</h2>
+                <h5>Are you sure you want to join?</h5>
+                <hr />
 
-<div>
-    <h4>Challenge</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.StartDateTime)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.StartDateTime)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.EndDateTime)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.EndDateTime)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Goal)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Goal)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Repeat)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Repeat)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Activity)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Activity.ActivityId)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.IsGroupChallenge)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.IsGroupChallenge)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Groupid)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Groupid)
-        </dd>
-    </dl>
+                <div>
+                    <form asp-action="Join">
+                        <input type="hidden" asp-for="ChallengeId" />
+                        <input type="submit" value="Join" class="btn btn-success" />
+                        <a asp-action="Index" class="btn btn-info">Back to List</a>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <form asp-action="Join">
-        <input type="hidden" asp-for="ChallengeId" />
-        <input type="submit" value="Join" class="btn btn-success" />
-        <a asp-action="Index">Back to List</a>
-    </form>
-</div>
+
