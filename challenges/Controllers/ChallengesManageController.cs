@@ -20,11 +20,13 @@ namespace challenges.Controllers
         private readonly IUserChallengeRepository _userChallengeRepository;
         private readonly IChallengeRepository _challengeRepository;
         private readonly IActivityRepository _activityRepository;
+        private readonly IGoalMetricRepository _goalMetricRepository;
         private readonly IApiClient client;
 
         public ChallengesManageController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
-            IActivityRepository activityRepository, IApiClient client)
+            IActivityRepository activityRepository, IGoalMetricRepository goalMetricRepository, IApiClient client)
         {
+            _goalMetricRepository = goalMetricRepository;
             _userChallengeRepository = userChallengeRepository;
             _challengeRepository = challengeRepository;
             _activityRepository = activityRepository;
@@ -38,7 +40,7 @@ namespace challenges.Controllers
             
             if (isAdminOrCoord())
             {
-                var challengesContext =  _challengeRepository.GetAllGroup();
+                var challengesContext = await _challengeRepository.GetAllGroup();
 
                 foreach(var c in challengesContext)
                 {
@@ -48,7 +50,7 @@ namespace challenges.Controllers
                     c.Groupid = data.name;
                 }
 
-                return View(await challengesContext.ToListAsync());
+                return View(challengesContext);
             }
             else
             {
@@ -63,7 +65,7 @@ namespace challenges.Controllers
                     groupId = "NOTHING";
                  //TODO get user group and only display for that group
                  var challengesContext = _challengeRepository.GetAllByGroupId(groupId);
-                return View(await challengesContext.ToListAsync());
+                return View(await challengesContext);
             }
             
 
@@ -93,7 +95,8 @@ namespace challenges.Controllers
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
-            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
+
+            ViewData["GoalMetricId"] = new SelectList(await _goalMetricRepository.GetAllAsync(), "GoalMetricId", "GoalMetricDisplay");
             ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
             return View();
@@ -104,7 +107,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,,GoalMetric,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
@@ -152,7 +155,7 @@ namespace challenges.Controllers
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
-            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
+            ViewData["GoalMetricId"] = new SelectList(await _goalMetricRepository.GetAllAsync(), "GoalMetricId", "GoalMetricDisplay");
             ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
             return View(challenge);
@@ -177,7 +180,7 @@ namespace challenges.Controllers
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
-            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
+            ViewData["GoalMetricId"] = new SelectList(await _goalMetricRepository.GetAllAsync(), "GoalMetricId", "GoalMetricDisplay");
 
             ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
@@ -189,7 +192,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetric,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
@@ -247,7 +250,7 @@ namespace challenges.Controllers
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
-            ViewData["GoalMetric"] = new SelectList(GetGoalMetrics(), "Value", "Text");
+            ViewData["GoalMetricId"] = new SelectList(await _goalMetricRepository.GetAllAsync(), "GoalMetricId", "GoalMetricDisplay");
             ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
 
@@ -311,7 +314,8 @@ namespace challenges.Controllers
 
             var userId = User.Claims.Single(c => c.Type == "sub").Value;
             var challenge = await _challengeRepository.FindByIdAsync(id);
-            var userChallenge = _userChallengeRepository.GetByCid_Uid(userId, id);
+            var userChallenge = await _userChallengeRepository.GetByCid_Uid(userId, id);
+
             if (userChallenge.Count() > 0) {
                 return RedirectToAction(nameof(Index));
             }
@@ -353,18 +357,5 @@ namespace challenges.Controllers
             }
             return items;
         }
-
-        public IList<SelectListItem> GetGoalMetrics()
-        {
-            IList<SelectListItem> items = new List<SelectListItem>();
-
-            items.Add(new SelectListItem { Text = "Calories Burnt", Value = "CaloriesBurnt" });
-            items.Add(new SelectListItem { Text = "Steps Taken ", Value = "StepsTaken" });
-            items.Add(new SelectListItem { Text = "Metres Travelled", Value = "MetresTravelled" });
-            items.Add(new SelectListItem { Text = "Metres Elevation Gained", Value = "MetresElevationGained " });
-            return items;
-
-        }
-
     }
 }

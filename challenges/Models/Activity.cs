@@ -10,5 +10,6 @@ namespace challenges.Models
     {
         public virtual int ActivityId { get; set; }
         public virtual string ActivityName { get; set; }
+        public virtual int DbActivityId { get; set; }
     }
 }

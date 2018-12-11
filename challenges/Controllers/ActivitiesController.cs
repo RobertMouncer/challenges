@@ -61,7 +61,8 @@ namespace challenges.Controllers
             {
                 i++;
                 var dataName = (string)d.name;
-                var item = new SelectListItem { Text = dataName, Value = i.ToString() };
+                var dataId = d.Id;
+                var item = new SelectListItem { Text = dataName, Value = dataId };
                 items.Add(item);
             }
             return items;
@@ -90,20 +91,38 @@ namespace challenges.Controllers
             {
                 ModelState.AddModelError("ActivityName", "Activity already exists. Please enter another activity.");
             }
+
+
+            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+
+            activity.DbActivityId = FindDbId(activity.ActivityName, activitiesContent);
+            
             if (ModelState.IsValid)
             {
                 await _activityRepository.AddAsync(activity);
                 return RedirectToAction(nameof(Index));
             }
 
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
-            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
-
             var items = GetActivities(activitiesContent);
-
             ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
 
             return View(activity);
+        }
+
+        private int FindDbId(string activityName, string activitiesContent)
+        {
+            dynamic data = JsonConvert.DeserializeObject(activitiesContent);
+
+            foreach (var d in data)
+            {
+                var dataName = (string)d.name;
+                if (dataName == activityName)
+                {
+                    return (d.id);
+                }
+            }
+            return 0;
         }
 
         // GET: Activities/Edit/5
@@ -144,6 +163,10 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
+            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+
+            activity.DbActivityId = FindDbId(activity.ActivityName, activitiesContent);
             if (ModelState.IsValid)
             {
                 try
@@ -164,8 +187,6 @@ namespace challenges.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
-            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
             var items = GetActivities(activitiesContent);
 
             ViewData["ActivityName"] = new SelectList(items, "Text", "Text");

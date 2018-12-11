@@ -12,7 +12,8 @@ namespace challenges.Models
         public virtual DateTime StartDateTime { get; set; }
         public virtual DateTime EndDateTime { get; set; }
         public virtual int Goal { get; set; }
-        public virtual string GoalMetric { get; set; }
+        public virtual GoalMetric GoalMetric { get; set; }
+        public virtual int GoalMetricId { get; set; }
         public virtual bool Repeat { get; set; }
         public virtual Activity Activity {get; set;}
         public virtual int ActivityId { get; set; }

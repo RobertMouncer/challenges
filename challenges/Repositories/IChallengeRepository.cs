@@ -14,9 +14,9 @@ namespace challenges.Repositories
 
         Task<List<Challenge>> GetAllAsync();
 
-        IQueryable<Challenge> GetAllGroup();
+        Task<List<Challenge>> GetAllGroup();
 
-        IQueryable<Challenge> GetAllByGroupId(string id);
+        Task<List<Challenge>> GetAllByGroupId(string id);
 
         Task<Challenge> AddAsync(Challenge challenge);
 

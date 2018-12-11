@@ -26,6 +26,7 @@ namespace challenges.Repositories
         public async Task<UserChallenge> GetByIdAsync(int id)
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .SingleOrDefaultAsync(g => g.UserChallengeId == id);
@@ -34,41 +35,38 @@ namespace challenges.Repositories
         public async Task<List<UserChallenge>> GetAllAsync()
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .ToListAsync();
         }
 
-        public IQueryable<UserChallenge> GetAll()
+        public async Task<List<UserChallenge>> GetByUId(string userId)
         {
-            return _context.UserChallenge.Include(u => u.Challenge)
-                .Include(a => a.Challenge.Activity);
-        }
-
-        public IQueryable<UserChallenge> GetByUId(string userId)
-        {
-            return _context.UserChallenge.Include(u => u.Challenge)
+            return await _context.UserChallenge.Include(u => u.Challenge).Include(c => c.Challenge.GoalMetric)
                 .Include(a => a.Challenge.Activity)
-                .Where(c => c.UserId.Equals(userId));
+                .Where(c => c.UserId.Equals(userId)).ToListAsync();
         }
 
         public async Task<List<UserChallenge>> GetGroupByUid(string userId)
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .Where(m => m.Challenge.IsGroupChallenge && m.UserId == userId)
                 .ToListAsync();
         }
 
-        public IQueryable<UserChallenge> GetByCid_Uid(string userId, int challengeId)
+        public async Task<List<UserChallenge>> GetByCid_Uid(string userId, int challengeId)
         {
-            return _context.UserChallenge.Where(uc => uc.ChallengeId == challengeId && uc.UserId == userId);
+            return await _context.UserChallenge.Where(uc => uc.ChallengeId == challengeId && uc.UserId == userId).ToListAsync();
         }
 
         public async Task<List<UserChallenge>> GetAllPersonalChallenges(string userId)
         {
             return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
                 .Include(b => b.Challenge)
                 .ThenInclude(c => c.Activity)
                 .Where(m => m.UserId == userId)

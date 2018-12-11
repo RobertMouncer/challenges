@@ -73,10 +73,11 @@
                 @Html.DisplayFor(modelItem => item.Challenge.Goal)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Challenge.GoalMetric)
+                @Html.DisplayFor(modelItem => item.Challenge.GoalMetric.GoalMetricDisplay)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PercentageComplete)
+                %
             </td>
             @if (isAdminOrCoordinator)
             {

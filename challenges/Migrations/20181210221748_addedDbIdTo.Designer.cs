@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using challenges.Data;
 
 namespace challenges.Migrations
 {
     [DbContext(typeof(challengesContext))]
-    partial class ChallengesContextModelSnapshot : ModelSnapshot
+    [Migration("20181210221748_addedDbIdTo")]
+    partial class addedDbIdTo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,7 +44,7 @@ namespace challenges.Migrations
 
                     b.Property<int>("Goal");
 
-                    b.Property<int>("GoalMetricId");
+                    b.Property<string>("GoalMetric");
 
                     b.Property<string>("Groupid");
 
@@ -56,23 +58,7 @@ namespace challenges.Migrations
 
                     b.HasIndex("ActivityId");
 
-                    b.HasIndex("GoalMetricId");
-
                     b.ToTable("Challenge");
-                });
-
-            modelBuilder.Entity("challenges.Models.GoalMetric", b =>
-                {
-                    b.Property<int>("GoalMetricId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("GoalMetricDbName");
-
-                    b.Property<string>("GoalMetricDisplay");
-
-                    b.HasKey("GoalMetricId");
-
-                    b.ToTable("GoalMetric");
                 });
 
             modelBuilder.Entity("challenges.Models.UserChallenge", b =>
@@ -98,11 +84,6 @@ namespace challenges.Migrations
                     b.HasOne("challenges.Models.Activity", "Activity")
                         .WithMany()
                         .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("challenges.Models.GoalMetric", "GoalMetric")
-                        .WithMany()
-                        .HasForeignKey("GoalMetricId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
