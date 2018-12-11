@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "title": "Challenges",
     "contact": {
       "name": "Robert",
@@ -24,7 +24,7 @@
     }
   ],
   "paths": {
-    "/status": {
+    "/api/status": {
       "get": {
         "tags": [
           "Status"
@@ -44,7 +44,7 @@
         }
       }
     },
-    "/activities": {
+    "/api/activities": {
       "get": {
         "tags": [
           "Activities"
@@ -67,7 +67,7 @@
         }
       }
     },
-    "/challenge": {
+    "/api/challenges": {
       "post": {
         "tags": [
           "UserChallenges"
@@ -104,7 +104,7 @@
         }
       }
     },
-    "/challenge/getGroup/{UID}": {
+    "/api/challenges/getGroup/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
@@ -143,7 +143,7 @@
         }
       }
     },
-    "/challenge/getPersonal/{UID}": {
+    "/api/challenges/getPersonal/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
@@ -181,7 +181,7 @@
         }
       }
     },
-    "/challenge/{ChallengeId}": {
+    "/api/challenges/{ChallengeId}": {
       "put": {
         "tags": [
           "UserChallenges"
@@ -277,16 +277,23 @@
           "type": "string",
           "example": "2018/07/16 09:00:00"
         },
+        "goal": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "GoalMetric": {
+          "$ref": "#/definitions/GoalMetric"
+        },
+        "GoalMetricId": {
+          "type": "integer",
+          "format": "int64"
+        },
         "activityId": {
           "type": "integer",
           "format": "int64"
         },
         "activity": {
           "$ref": "#/definitions/Activity"
-        },
-        "goal": {
-          "type": "integer",
-          "format": "int64"
         },
         "repeat": {
           "type": "boolean"
@@ -304,8 +311,7 @@
       "type": "object",
       "required": [
         "activityId",
-        "activityName",
-        "goalMetric"
+        "activityName"
       ],
       "properties": {
         "activityId": {
@@ -316,9 +322,9 @@
           "type": "string",
           "example": "Swimming"
         },
-        "goalMetric": {
-          "type": "string",
-          "example": "Seconds"
+        "DbActivityId": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -334,11 +340,32 @@
           "example": "some-user-id"
         },
         "challengeId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "challenge": {
           "$ref": "#/definitions/Challenge"
         },
         "percentageComplete": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "GoalMetric": {
+      "type": "object",
+      "properties": {
+        "GoalMetricId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "GoalMetricDisplay": {
+          "type": "string",
+          "example": "Steps Taken"
+        },
+        "GoalMetricDbName": {
+          "type": "string",
+          "example": "StepsTaken"
         }
       }
     }
