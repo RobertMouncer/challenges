@@ -30,8 +30,13 @@ namespace challengesTest.TestUtilities
                     StartDateTime = new DateTime().Add(TimeSpan.FromDays(1)),
                     EndDateTime = new DateTime().Add(TimeSpan.FromDays(2)),
                     Goal = 1000,
-                    GoalMetric = "TestGoalMetric",
-                    Repeat = false,
+                    GoalMetric = new GoalMetric
+                    {
+                        GoalMetricId = 2,
+                        GoalMetricDisplay = "Steps Taken",
+                        GoalMetricDbName = "StepsTaken"
+                    },
+                    GoalMetricId = 2,
                     Activity = new Activity
                     {
                         ActivityId = 3,
@@ -51,6 +56,7 @@ namespace challengesTest.TestUtilities
             var aId = 10 + id;
             var cId = 20 + id;
             var uId = 30 + id;
+            var gId = 40 + id;
             return new UserChallenge
             {
                 UserChallengeId = uId,
@@ -61,8 +67,13 @@ namespace challengesTest.TestUtilities
                     StartDateTime = new DateTime().Add(TimeSpan.FromDays(1)),
                     EndDateTime = new DateTime().Add(TimeSpan.FromDays(2)),
                     Goal = 1000 + cId,
-                    GoalMetric = "TestGoalMetric",
-                    Repeat = false,
+                    GoalMetricId = gId,
+                    GoalMetric = new GoalMetric
+                    {
+                        GoalMetricId = gId,
+                        GoalMetricDisplay = "Steps Taken",
+                        GoalMetricDbName = "StepsTaken"
+                    },
                     Activity = new Activity
                     {
                         ActivityId = aId,
@@ -81,6 +92,7 @@ namespace challengesTest.TestUtilities
             var aId = 10 + id;
             var cId = 20 + id;
             var uId = 30 + id;
+            var gmId = 40 + id;
             var gId = "55";
             return new UserChallenge
             {
@@ -92,8 +104,13 @@ namespace challengesTest.TestUtilities
                     StartDateTime = new DateTime().Add(TimeSpan.FromDays(1)),
                     EndDateTime = new DateTime().Add(TimeSpan.FromDays(2)),
                     Goal = 1000 + cId,
-                    GoalMetric = "TestGoalMetric",
-                    Repeat = false,
+                    GoalMetricId = gmId,
+                    GoalMetric = new GoalMetric
+                    {
+                        GoalMetricId = gmId,
+                        GoalMetricDisplay = "Steps Taken",
+                        GoalMetricDbName = "StepsTaken"
+                    },
                     Activity = new Activity
                     {
                         ActivityId = aId,

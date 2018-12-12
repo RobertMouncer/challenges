@@ -65,12 +65,12 @@ namespace challenges.Controllers
             
             {
 
-                var challengesContext = _userChallengeRepository.GetByUId(userId);
+                var challengesContext = await _userChallengeRepository.GetByUId(userId);
                 
                 SharedFunctionality.Init(_userChallengeRepository, client);
-                SharedFunctionality.UpdatePercentageListAsync(await challengesContext.ToListAsync());
+                SharedFunctionality.UpdatePercentageListAsync(challengesContext);
 
-                challengesContext = await _userChallengeRepository.GetByUId(userId);
+                challengesContext =  await _userChallengeRepository.GetByUId(userId);
 
                 return View(challengesContext);
             }
