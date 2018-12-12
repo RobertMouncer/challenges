@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using challenges.Models;
 
 namespace challenges.Data
 {
@@ -14,5 +15,7 @@ namespace challenges.Data
         public DbSet<challenges.Models.Challenge> Challenge { get; set; }
 
         public DbSet<challenges.Models.UserChallenge> UserChallenge { get; set; }
+
+        public DbSet<challenges.Models.GoalMetric> GoalMetric { get; set; }
     }
 }

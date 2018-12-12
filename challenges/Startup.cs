@@ -35,6 +35,7 @@ namespace challenges
             services.AddScoped<IUserChallengeRepository, UserChallengeRepository>();
             services.AddScoped<IChallengeRepository, ChallengeRepository>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<IGoalMetricRepository, GoalMetricRepository>();
 
             services.AddHttpClient();
             services.AddHttpClient("challengesHttpClient", client => {
@@ -138,7 +139,7 @@ namespace challenges
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=ChallengesManage}/{action=Index}/{id?}");
+                    template: "{controller=UserChallenges}/{action=Index}/{id?}");
             });
         }
 

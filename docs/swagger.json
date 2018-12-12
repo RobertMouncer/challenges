@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
-    "version": "1.3.0",
+    "version": "1.5.0",
     "title": "Challenges",
     "contact": {
       "name": "Robert",
@@ -24,7 +24,7 @@
     }
   ],
   "paths": {
-    "/status": {
+    "/api/status": {
       "get": {
         "tags": [
           "Status"
@@ -44,7 +44,7 @@
         }
       }
     },
-    "/activities": {
+    "/api/activities": {
       "get": {
         "tags": [
           "Activities"
@@ -67,7 +67,7 @@
         }
       }
     },
-    "/challenge": {
+    "/api/challengesManage": {
       "post": {
         "tags": [
           "UserChallenges"
@@ -104,7 +104,7 @@
         }
       }
     },
-    "/challenge/find/{UGID}": {
+    "/api/challengesManage/getGroup/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
@@ -116,9 +116,9 @@
         ],
         "parameters": [
           {
-            "name": "UGID",
+            "name": "UID",
             "in": "path",
-            "description": "UserGroupId to retrieve challenges for.",
+            "description": "UserId to retrieve group challenges for.",
             "required": true,
             "type": "integer",
             "format": "int64"
@@ -143,7 +143,7 @@
         }
       }
     },
-    "/challenge/fromUser/{UID}": {
+    "/api/challengesManage/getPersonal/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
@@ -181,7 +181,7 @@
         }
       }
     },
-    "/challenge/{ChallengeId}": {
+    "/api/challengesManage/{ChallengeId}": {
       "put": {
         "tags": [
           "UserChallenges"
@@ -277,20 +277,24 @@
           "type": "string",
           "example": "2018/07/16 09:00:00"
         },
+        "goal": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "GoalMetric": {
+          "$ref": "#/definitions/GoalMetric"
+        },
+        "GoalMetricId": {
+          "type": "integer",
+          "format": "int64"
+        },
         "activityId": {
           "type": "integer",
           "format": "int64"
         },
         "activity": {
           "$ref": "#/definitions/Activity"
-        },
-        "goal": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "repeat": {
-          "type": "boolean"
-        },
+        },        
         "isGroupChallenge": {
           "type": "boolean"
         },
@@ -304,8 +308,7 @@
       "type": "object",
       "required": [
         "activityId",
-        "activityName",
-        "goalMetric"
+        "activityName"
       ],
       "properties": {
         "activityId": {
@@ -316,9 +319,9 @@
           "type": "string",
           "example": "Swimming"
         },
-        "goalMetric": {
-          "type": "string",
-          "example": "Seconds"
+        "DbActivityId": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -334,11 +337,32 @@
           "example": "some-user-id"
         },
         "challengeId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "challenge": {
           "$ref": "#/definitions/Challenge"
         },
         "percentageComplete": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "GoalMetric": {
+      "type": "object",
+      "properties": {
+        "GoalMetricId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "GoalMetricDisplay": {
+          "type": "string",
+          "example": "Steps Taken"
+        },
+        "GoalMetricDbName": {
+          "type": "string",
+          "example": "StepsTaken"
         }
       }
     }

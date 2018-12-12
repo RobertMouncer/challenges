@@ -34,23 +34,7 @@ namespace challenges.Controllers
             return View(await _activityRepository.GetAllAsync());
         }
 
-        // GET: Activities/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var activity = await _activityRepository.GetByIdIncAsync((int) id);
-            if (activity == null)
-            {
-                return NotFound();
-            }
-
-            return View(activity);
-        }
-
+     
         public IList<SelectListItem> GetActivities(string activitiesContent)
         {
             dynamic data = JsonConvert.DeserializeObject(activitiesContent);
@@ -61,7 +45,8 @@ namespace challenges.Controllers
             {
                 i++;
                 var dataName = (string)d.name;
-                var item = new SelectListItem { Text = dataName, Value = i.ToString() };
+                var dataId = d.Id;
+                var item = new SelectListItem { Text = dataName, Value = dataId };
                 items.Add(item);
             }
             return items;
@@ -90,86 +75,38 @@ namespace challenges.Controllers
             {
                 ModelState.AddModelError("ActivityName", "Activity already exists. Please enter another activity.");
             }
+
+
+            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
+
+            activity.DbActivityId = FindDbId(activity.ActivityName, activitiesContent);
+            
             if (ModelState.IsValid)
             {
                 await _activityRepository.AddAsync(activity);
                 return RedirectToAction(nameof(Index));
             }
 
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
-            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
-
             var items = GetActivities(activitiesContent);
-
             ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
 
             return View(activity);
         }
 
-        // GET: Activities/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        private int FindDbId(string activityName, string activitiesContent)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            dynamic data = JsonConvert.DeserializeObject(activitiesContent);
 
-            var activity = await _activityRepository.FindByIdAsync((int) id);
-            if (activity == null)
+            foreach (var d in data)
             {
-                return NotFound();
-            }
-
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
-            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
-            var items = GetActivities(activitiesContent);
-
-            ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
-            return View(activity);
-        }
-
-        // POST: Activities/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ActivityId,ActivityName")] Activity activity)
-        {
-            if (ActivityNameExists(activity.ActivityName))
-            {
-                ModelState.AddModelError("ActivityName", "Activity already exists. Please enter another activity.");
-            }
-            if (id != activity.ActivityId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                var dataName = (string)d.name;
+                if (dataName == activityName)
                 {
-                    await _activityRepository.UpdateAsync(activity);
+                    return (d.id);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ActivityExists(activity.ActivityId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
-
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
-            var activitiesContent = activities.Content.ReadAsStringAsync().Result;
-            var items = GetActivities(activitiesContent);
-
-            ViewData["ActivityName"] = new SelectList(items, "Text", "Text");
-            return View(activity);
+            return 0;
         }
 
         // GET: Activities/Delete/5

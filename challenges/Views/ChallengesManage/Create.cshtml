@@ -1,73 +1,69 @@
 ﻿@model challenges.Models.Challenge
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Challenge";
     var userId = User.Claims.Single(c => c.Type == "sub").Value;
     var isAdminOrCoordinator = User.HasClaim("user_type", "administrator") || User.HasClaim("user_type", "coordinator");
 }
-
-<h2>Create</h2>
-
-<h4>Challenge</h4>
-<hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="StartDateTime" class="control-label"></label>
-                <input asp-for="StartDateTime" class="form-control" />
-                <span asp-validation-for="StartDateTime" class="text-danger"></span>
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">Create Challenge</strong>
             </div>
-            <div class="form-group">
-                <label asp-for="EndDateTime" class="control-label"></label>
-                <input asp-for="EndDateTime" class="form-control" />
-                <span asp-validation-for="EndDateTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ActivityId" class="control-label"></label>
-                <select asp-for="ActivityId" class="form-control" asp-items="ViewBag.ActivityId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Goal" class="control-label"></label>
-                <input asp-for="Goal" class="form-control" />
-                <span asp-validation-for="Goal" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GoalMetric" class="control-label"></label>
-                <select asp-for="GoalMetric" class="form-control" asp-items="ViewBag.GoalMetric"></select>
-            </div>
-            @if (isAdminOrCoordinator)
-            {
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="IsGroupChallenge" /> @Html.DisplayNameFor(model => model.IsGroupChallenge)
-                        <span asp-validation-for="IsGroupChallenge" class="text-danger"></span>
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="Groupid" class="control-label"></label>
-                <select asp-for="Groupid" class="form-control" asp-items="ViewBag.Groupid"></select>
-            </div>
-            }
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="Repeat" /> @Html.DisplayNameFor(model => model.Repeat)
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
-</div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="StartDateTime" class="control-label"></label>
+                        <input asp-for="StartDateTime" class="form-control" />
+                        <span asp-validation-for="StartDateTime" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EndDateTime" class="control-label"></label>
+                        <input asp-for="EndDateTime" class="form-control" />
+                        <span asp-validation-for="EndDateTime" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ActivityId" class="control-label"></label>
+                        <select asp-for="ActivityId" class="form-control" asp-items="ViewBag.ActivityId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Goal" class="control-label"></label>
+                        <input asp-for="Goal" class="form-control" />
+                        <span asp-validation-for="Goal" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="GoalMetricId" class="control-label"></label>
+                        <select asp-for="GoalMetricId" class="form-control" asp-items="ViewBag.GoalMetricId"></select>
+                    </div>
+                    @if (isAdminOrCoordinator)
+                    {
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="IsGroupChallenge" /> @Html.DisplayNameFor(model => model.IsGroupChallenge)
+                                    <span asp-validation-for="IsGroupChallenge" class="text-danger"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Groupid" class="control-label"></label>
+                            <select asp-for="Groupid" class="form-control" asp-items="ViewBag.Groupid"></select>
+                        </div>
+                    }
+                    
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-success" />
+                    </div>
+                </form>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+                <div>
+                    <a asp-action="Index">Back to List</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

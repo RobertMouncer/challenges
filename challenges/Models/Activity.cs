@@ -8,7 +8,13 @@ namespace challenges.Models
 {
     public class Activity
     {
+
+        
         public virtual int ActivityId { get; set; }
+
+        [Display(Name = "Activity")]
         public virtual string ActivityName { get; set; }
+
+        public virtual int DbActivityId { get; set; }
     }
 }

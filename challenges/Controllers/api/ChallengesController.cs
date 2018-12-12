@@ -14,7 +14,7 @@ using YourApp.Services;
 
 namespace challenges.Controllers.api
 {
-    [Route("api/[controller]")]
+    [Route("api/challengesManage")]
     [ApiController]
     //[Authorize(AuthenticationSchemes = "Bearer")]
     public class ChallengesController : ControllerBase
@@ -38,28 +38,31 @@ namespace challenges.Controllers.api
         public async Task<IActionResult> NewChallenge([FromBody] UserChallenge userChallenge)
         {
             await ValidateUserChallenge(userChallenge);
-            
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
             userChallenge.Challenge.Activity = null;
+
             var challenge = await _challengeRepository.AddAsync(userChallenge.Challenge);
+
             userChallenge.Challenge = null;
             userChallenge.ChallengeId = challenge.ChallengeId;
+
             var user = await _userChallengeRepository.AddAsync(userChallenge);
+        
             return Ok(user);
         }
 
-        [HttpGet("find/{ugid}")]
-        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] string ugid)
+        [HttpGet("getGroup/{uid}")]
+        public async Task<IActionResult> ListUserGroupChallenges([FromRoute] string uid)
         {
-            var userChallenges = await _userChallengeRepository.GetByGroupIdAsync(ugid);
+            var userChallenges = await _userChallengeRepository.GetGroupByUid(uid);
 
             if (userChallenges == null)
-                return NotFound();
+                return Ok(new List<object>());
             
             SharedFunctionality.Init(_userChallengeRepository, _client);
             SharedFunctionality.UpdatePercentageListAsync(userChallenges);
@@ -67,14 +70,15 @@ namespace challenges.Controllers.api
             return Ok(userChallenges);
         }
 
-        [HttpGet("fromUser/{uid}")]
+        [HttpGet("getPersonal/{uid}")]
         public async Task<IActionResult> ListPersonalChallenges([FromRoute] string uid)
         {
             var userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
 
-            if (userChallenges == null)
-                return NotFound();
+            if (userChallenges == null){
             
+                return Ok(new List<object>());
+            }
             SharedFunctionality.Init(_userChallengeRepository, _client);
             SharedFunctionality.UpdatePercentageListAsync(userChallenges);
 
@@ -111,7 +115,6 @@ namespace challenges.Controllers.api
 
             userChallenge.Challenge.Activity = null;
             await _challengeRepository.DeleteAsync(userChallenge.Challenge);
-            //await _userChallengeRepository.DeleteAsync(userChallenge);
             return Ok(userChallenge);
         }
 
@@ -120,7 +123,10 @@ namespace challenges.Controllers.api
             if (userChallenge.Challenge.IsGroupChallenge)
                 ModelState.AddModelError("IsGroupChallenge", "Invalid userChallenge, must be a personal challenge.");
 
-            var activity = await _activityRepository.FindByIdAsync(userChallenge.Challenge.Activity.ActivityId);
+            var challenge = userChallenge.Challenge;
+            var activityId = challenge.Activity != null ? challenge.Activity.ActivityId : challenge.ActivityId;
+
+            var activity = await _activityRepository.FindByIdAsync(activityId);
             if (activity == null)
                 ModelState.AddModelError("activityId", "Invalid Activity id received, activity doesn't exist.");
         }

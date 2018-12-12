@@ -39,7 +39,7 @@ namespace challenges.Controllers
             //this if is awful, please change if you have another way, please do
             if (isAdminOrCoord())
             {
-                var challengesContext = _userChallengeRepository.GetAll();
+                var challengesContext = await _userChallengeRepository.GetAllAsync();
                 List<string> userList = new List<string>();
 
                 foreach (UserChallenge u in challengesContext)
@@ -60,19 +60,19 @@ namespace challenges.Controllers
                         }
                     }
                 }
-
-                return View(await challengesContext.ToListAsync());
+                return View(challengesContext);
             } else
             
             {
+
                 var challengesContext = _userChallengeRepository.GetByUId(userId);
                 
                 SharedFunctionality.Init(_userChallengeRepository, client);
                 SharedFunctionality.UpdatePercentageListAsync(await challengesContext.ToListAsync());
 
-                challengesContext = _userChallengeRepository.GetByUId(userId);
+                challengesContext = await _userChallengeRepository.GetByUId(userId);
 
-                return View(await challengesContext.ToListAsync());
+                return View(challengesContext);
             }
             
 
@@ -149,35 +149,35 @@ namespace challenges.Controllers
 
             foreach (var d in dataString)
             {
-                if (d.activityTypeId == userChallenge.Challenge.ActivityId)
+                var activityTypeId = d.activityTypeId;
+                if (activityTypeId == userChallenge.Challenge.Activity.DbActivityId)
                 {
-                    switch (userChallenge.Challenge.GoalMetric)
+                    switch (userChallenge.Challenge.GoalMetric.GoalMetricDbName)
                     {
-                        case "caloriesBurnt":
-                            progress += d.caloriesBurnt;
+                        //TODO CHANGE THIS TO BE NICER
+                        case "CaloriesBurnt":
+                            progress += (int)d.caloriesBurnt;
                             break;
-                        case "averageHeartRate":
-                            progress += d.averageHeartRate;
+                        case "AverageHeartRate":
+                            progress += (int)d.averageHeartRate;
                             break;
-                        case "stepsTaken":
-                            progress += d.stepsTaken;
+                        case "StepsTaken":
+                            progress += (int)d.stepsTaken;
                             break;
-                        case "metresTravelled":
-                            progress += d.metresTravelled;
+                        case "MetresTravelled":
+                            progress += (int)d.metresTravelled;
                             break;
-                        case "metresElevationGained":
-                            progress += d.metresElevationGained;
+                        case "MetresElevationGained":
+                            progress += (int)d.metresElevationGained;
                             break;
                     }
                 }
             }
 
-            var percentageComplete = (progress / userChallenge.Challenge.Goal)*100;
-            if(percentageComplete > 100)
-            {
-                percentageComplete = 100;
-            }
-            userChallenge.PercentageComplete = percentageComplete;
+
+            double percentageComplete = ((double)progress / (double)userChallenge.Challenge.Goal)*100;
+
+            userChallenge.PercentageComplete = (int)Math.Min(100, percentageComplete);
 
             await _userChallengeRepository.UpdateAsync(userChallenge);
 

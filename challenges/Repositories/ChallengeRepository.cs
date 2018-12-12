@@ -25,25 +25,25 @@ namespace challenges.Repositories
         public async Task<Challenge> GetByIdIncAsync(int id)
         {
             return await _context.Challenge
-                .Include(b => b.Activity)
+                .Include(b => b.Activity).Include(c => c.GoalMetric)
                 .SingleOrDefaultAsync(g => g.ChallengeId == id);
         }
 
         public async Task<List<Challenge>> GetAllAsync()
         {
             return await _context.Challenge
-                    .Include(b => b.Activity)
+                    .Include(b => b.Activity).Include(c => c.GoalMetric)
                     .ToListAsync();
         }
 
-        public IQueryable<Challenge> GetAllGroup()
+        public Task<List<Challenge>> GetAllGroup()
         {
-            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge);
+            return _context.Challenge.Include(c => c.Activity).Include(c => c.GoalMetric).Where(c => c.IsGroupChallenge).ToListAsync();
         }
 
-        public IQueryable<Challenge> GetAllGroupById(string id)
+        public Task<List<Challenge>> GetAllByGroupId(string id)
         {
-            return _context.Challenge.Include(c => c.Activity).Where(c => c.IsGroupChallenge && c.Groupid == id);
+            return _context.Challenge.Include(c => c.Activity).Include(c => c.GoalMetric).Where(c => c.IsGroupChallenge && c.Groupid == id).ToListAsync();
         }
 
         public async Task<Challenge> AddAsync(Challenge challenge)
