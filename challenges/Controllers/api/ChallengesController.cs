@@ -39,8 +39,6 @@ namespace challenges.Controllers.api
                 return BadRequest(ModelState);
             }
 
-            //userChallenge.Challenge.ActivityId = userChallenge.Challenge.Activity.ActivityId;
-
             userChallenge.Challenge.Activity = null;
 
             var dbId = userChallenge.Challenge.ActivityId;
@@ -54,7 +52,7 @@ namespace challenges.Controllers.api
             userChallenge.ChallengeId = challenge.ChallengeId;
 
             var user = await _userChallengeRepository.AddAsync(userChallenge);
-
+        
             return Ok(user);
         }
 

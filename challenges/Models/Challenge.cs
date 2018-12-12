@@ -23,8 +23,6 @@ namespace challenges.Models
         [Display(Name = "Goal Metric")]
         public virtual int GoalMetricId { get; set; }
 
-        public virtual bool Repeat { get; set; }
-
         public virtual Activity Activity {get; set;}
 
         [Display(Name = "Activity")]

@@ -59,7 +59,6 @@ namespace challenges.Controllers
                         }
                     }
                 }
-
                 return View(challengesContext);
             } else
             
@@ -69,7 +68,13 @@ namespace challenges.Controllers
                 foreach(var c in challengesContext)
                 {
                     var url = "https://docker2.aberfitness.biz/health-data-repository/api/Activities/ByUser/"
-                                                        + c.UserId + "?from=" + c.Challenge.StartDateTime.ToString("yyyy-MM-dd") + "&to=" + DateTime.Now.ToString("yyyy-MM-dd");
+                               + c.UserId 
+                               + "?from=" 
+                               + c.Challenge.StartDateTime.ToString("yyyy-MM-dd") 
+                               + "&to=" 
+                               + DateTime.Now.ToString("yyyy-MM-dd");
+
+
                     var userData = await client.GetAsync(url);
 
                     var userDataResult = userData.Content.ReadAsStringAsync().Result;
