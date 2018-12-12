@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using challenges.Controllers.shared;
 using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,24 +10,28 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using YourApp.Services;
 
 namespace challenges.Controllers.api
 {
     [Route("api/challengesManage")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
     public class ChallengesController : ControllerBase
     {
         private readonly IChallengeRepository _challengeRepository;
         private readonly IUserChallengeRepository _userChallengeRepository;
         private readonly IActivityRepository _activityRepository;
+        private readonly IApiClient _client;
 
         public ChallengesController(IChallengeRepository challengeRepository, 
-            IUserChallengeRepository userChallengeRepository, IActivityRepository activityRepository)
+            IUserChallengeRepository userChallengeRepository, IActivityRepository activityRepository,
+            IApiClient client)
         {
             _challengeRepository = challengeRepository;
             _userChallengeRepository = userChallengeRepository;
             _activityRepository = activityRepository;
+            _client = client;
         }
 
         [HttpPost]
@@ -59,6 +64,9 @@ namespace challenges.Controllers.api
             if (userChallenges == null)
                 return Ok(new List<object>());
             
+            SharedFunctionality.Init(_userChallengeRepository, _client);
+            SharedFunctionality.UpdatePercentageListAsync(userChallenges);
+           
             return Ok(userChallenges);
         }
 
@@ -67,8 +75,12 @@ namespace challenges.Controllers.api
         {
             var userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
 
-            if (userChallenges == null)
+            if (userChallenges == null){
+            
                 return Ok(new List<object>());
+            }
+            SharedFunctionality.Init(_userChallengeRepository, _client);
+            SharedFunctionality.UpdatePercentageListAsync(userChallenges);
 
             return Ok(userChallenges);
         }

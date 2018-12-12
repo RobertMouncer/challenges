@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using challenges.Controllers.shared;
 using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -63,25 +64,11 @@ namespace challenges.Controllers
             } else
             
             {
-                var challengesContext = await _userChallengeRepository.GetByUId(userId);
 
-                foreach(var c in challengesContext)
-                {
-                    var url = "https://docker2.aberfitness.biz/health-data-repository/api/Activities/ByUser/"
-                               + c.UserId 
-                               + "?from=" 
-                               + c.Challenge.StartDateTime.ToString("yyyy-MM-dd") 
-                               + "&to=" 
-                               + DateTime.Now.ToString("yyyy-MM-dd");
-
-
-                    var userData = await client.GetAsync(url);
-
-                    var userDataResult = userData.Content.ReadAsStringAsync().Result;
-
-                    await UpdatePercentageCompleteAsync(c, userDataResult);
-
-                }
+                var challengesContext = _userChallengeRepository.GetByUId(userId);
+                
+                SharedFunctionality.Init(_userChallengeRepository, client);
+                SharedFunctionality.UpdatePercentageListAsync(await challengesContext.ToListAsync());
 
                 challengesContext = await _userChallengeRepository.GetByUId(userId);
 
@@ -155,7 +142,7 @@ namespace challenges.Controllers
         }
 
         //this is also awful, please change
-        private async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
+        /*private async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
         {
             dynamic dataString = JsonConvert.DeserializeObject(userDataString);
             var progress = 0;
@@ -195,6 +182,6 @@ namespace challenges.Controllers
             await _userChallengeRepository.UpdateAsync(userChallenge);
 
             return userChallenge;
-        }
+        }*/
     }
 }
