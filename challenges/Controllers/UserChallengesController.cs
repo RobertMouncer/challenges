@@ -40,6 +40,10 @@ namespace challenges.Controllers
             if (isAdminOrCoord())
             {
                 var challengesContext = await _userChallengeRepository.GetAllAsync();
+                SharedFunctionality.Init(_userChallengeRepository, client);
+                SharedFunctionality.UpdatePercentageListAsync(challengesContext);
+                challengesContext = await _userChallengeRepository.GetAllAsync();
+
                 List<string> userList = new List<string>();
 
                 foreach (UserChallenge u in challengesContext)
