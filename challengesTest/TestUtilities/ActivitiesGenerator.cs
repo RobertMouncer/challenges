@@ -10,7 +10,7 @@ namespace challengesTest.TestUtilities
             List<Activity> list = new List<Activity>();
             for (var i = 0; i < quantity; i++)
             {
-                CreateActivity(i + 1);
+                list.Add(CreateActivity(i + 1));
             }
 
             return list;
