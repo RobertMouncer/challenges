@@ -41,6 +41,11 @@ namespace challenges.Controllers.api
 
             userChallenge.Challenge.Activity = null;
 
+            var dbId = userChallenge.Challenge.ActivityId;
+
+            var activity = await _activityRepository.GetByIdIncAsync(dbId);
+            userChallenge.Challenge.ActivityId = activity.ActivityId;
+
             var challenge = await _challengeRepository.AddAsync(userChallenge.Challenge);
 
             userChallenge.Challenge = null;
