@@ -66,7 +66,7 @@ namespace challenges.Controllers.api
             
             SharedFunctionality.Init(_userChallengeRepository, _client);
             SharedFunctionality.UpdatePercentageListAsync(userChallenges);
-           
+
             return Ok(userChallenges);
         }
 

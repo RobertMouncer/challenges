@@ -42,9 +42,9 @@ namespace challenges.Controllers.shared
 
             foreach (var d in dataString)
             {
-                if (d.activityTypeId == userChallenge.Challenge.ActivityId)
+                if (d.activityTypeId == userChallenge.Challenge.Activity.DbActivityId)
                 {
-                    switch (userChallenge.Challenge.GoalMetric)
+                    switch (userChallenge.Challenge.GoalMetric.GoalMetricDbName)
                     {
                         case "caloriesBurnt":
                             progress += d.caloriesBurnt;

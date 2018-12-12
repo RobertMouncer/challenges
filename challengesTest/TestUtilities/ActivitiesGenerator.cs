@@ -22,7 +22,8 @@ namespace challengesTest.TestUtilities
             return new Activity
             {
                 ActivityName = "TestActivity" + id,
-                ActivityId = id
+                ActivityId = id,
+                DbActivityId = id
             };
         }
     }
