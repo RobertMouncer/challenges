@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "title": "Challenges",
     "contact": {
       "name": "Robert",
@@ -67,7 +67,7 @@
         }
       }
     },
-    "/api/challenges": {
+    "/api/challengesManage": {
       "post": {
         "tags": [
           "UserChallenges"
@@ -104,7 +104,7 @@
         }
       }
     },
-    "/api/challenges/getGroup/{UID}": {
+    "/api/challengesManage/getGroup/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
@@ -143,7 +143,7 @@
         }
       }
     },
-    "/api/challenges/getPersonal/{UID}": {
+    "/api/challengesManage/getPersonal/{UID}": {
       "get": {
         "tags": [
           "UserChallenges"
@@ -181,7 +181,7 @@
         }
       }
     },
-    "/api/challenges/{ChallengeId}": {
+    "/api/challengesManage/{ChallengeId}": {
       "put": {
         "tags": [
           "UserChallenges"
@@ -294,10 +294,7 @@
         },
         "activity": {
           "$ref": "#/definitions/Activity"
-        },
-        "repeat": {
-          "type": "boolean"
-        },
+        },        
         "isGroupChallenge": {
           "type": "boolean"
         },

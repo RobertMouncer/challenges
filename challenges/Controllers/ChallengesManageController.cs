@@ -107,7 +107,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
@@ -192,7 +192,7 @@ namespace challenges.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,Repeat,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
+        public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
