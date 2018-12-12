@@ -111,7 +111,7 @@ namespace challenges.Controllers
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
-            if (DateTime.Compare(challenge.StartDateTime.Date, DateTime.Now.Date) <= 0)
+            if (DateTime.Compare(challenge.StartDateTime.Date, DateTime.Now.Date) < 0)
             {
                 ModelState.AddModelError("StartDateTime", "Date/Time is in the past. Please enter future Date or todays date.");
             }
