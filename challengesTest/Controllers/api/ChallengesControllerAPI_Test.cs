@@ -6,6 +6,7 @@ using challengesTest.TestUtilities;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using YourApp.Services;
 
 namespace challengesTest.Controllers.api
 {
@@ -15,6 +16,7 @@ namespace challengesTest.Controllers.api
         private readonly Mock<IUserChallengeRepository> _userChallengeRepository;
         private readonly Mock<IChallengeRepository> _challengesRepository;
         private readonly Mock<IActivityRepository> _activityRepository;
+        private readonly ApiClient apiClient;
 
         private string testGroupId = "55";
 
@@ -24,15 +26,15 @@ namespace challengesTest.Controllers.api
             _challengesRepository = new Mock<IChallengeRepository>();
             _activityRepository = new Mock<IActivityRepository>();
             _controller = new ChallengesController(_challengesRepository.Object, _userChallengeRepository.Object,
-                _activityRepository.Object);
+                _activityRepository.Object, apiClient);
         }
 
         [Fact]
         public async void ListUserGroupChallenges_ReturnsAllGroupChallenges()
         {
             var challenges = ChallengesGenerator.CreateList(10, true);
-            _userChallengeRepository.Setup(r => r.GetByGroupIdAsync("55")).ReturnsAsync(challenges).Verifiable();
-            var result = await _controller.ListUserGroupChallenges("55");
+            _userChallengeRepository.Setup(r => r.GetGroupByUid(testGroupId)).ReturnsAsync(challenges).Verifiable();
+            var result = await _controller.ListUserGroupChallenges(testGroupId);
             Assert.IsType<OkObjectResult>(result);
             _userChallengeRepository.Verify();
             _userChallengeRepository.VerifyNoOtherCalls();

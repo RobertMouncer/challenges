@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using challenges.Migrations;
@@ -37,6 +38,10 @@ namespace challenges.Controllers.shared
         //this is also awful, please change
         public static async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
         {
+            if(userDataString == "" || userDataString == null)
+            {
+                return userChallenge;
+            }
             dynamic dataString = JsonConvert.DeserializeObject(userDataString);
             var progress = 0;
 
@@ -61,16 +66,16 @@ namespace challenges.Controllers.shared
                         case "metresElevationGained":
                             progress += d.metresElevationGained;
                             break;
+                        default:
+                            progress = 0;
+                            break;
                     }
                 }
             }
 
             var percentageComplete = (progress / userChallenge.Challenge.Goal)*100;
-            if(percentageComplete > 100)
-            {
-                percentageComplete = 100;
-            }
-            userChallenge.PercentageComplete = percentageComplete;
+            
+            userChallenge.PercentageComplete = Math.Min(100, percentageComplete);
 
             await _userChallengeRepository.UpdateAsync(userChallenge);
 

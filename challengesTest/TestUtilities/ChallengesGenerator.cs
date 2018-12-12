@@ -7,12 +7,12 @@ namespace challengesTest.TestUtilities
 {
     public static class ChallengesGenerator
     {
-        public static List<UserChallenge> CreateList(int quantity, bool group_id)
+        public static List<UserChallenge> CreateList(int quantity, bool group)
         {
             List<UserChallenge> list = new List<UserChallenge>();
             for (var i = 0; i < quantity; i++)
             {
-                list.Add(group_id ? CreateUserChallengeGroup(i) : CreateUserChallengePersonal(i));
+                list.Add(group ? CreateUserChallengeGroup(i) : CreateUserChallengePersonal(i));
             }
 
             return list;
