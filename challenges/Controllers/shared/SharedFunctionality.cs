@@ -26,7 +26,7 @@ namespace challenges.Controllers.shared
             foreach(var c in userChallenges)
             {
                 var userData = await _apiClient.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/Activities/ByUser/" 
-                                                      + c.UserId + "?from=" + c.Challenge.StartDateTime.Date + "&to=" + c.Challenge.EndDateTime);
+                                                      + c.UserId + "?from=" + c.Challenge.StartDateTime.Date + "&to=" + DateTime.Now.Date);
 
                 var userDataResult = userData.Content.ReadAsStringAsync().Result;
 
@@ -38,7 +38,7 @@ namespace challenges.Controllers.shared
         //this is also awful, please change
         public static async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
         {
-            if(userDataString == "" || userDataString == null)
+            if(userDataString == "[]" || userDataString == null)
             {
                 return userChallenge;
             }
