@@ -90,32 +90,6 @@ namespace challenges.Controllers
 
         }
 
-
-        // GET: UserChallenges/Create
-        public IActionResult Create()
-        {
-            ViewData["ChallengeId"] = new SelectList(_challengeRepository.GetDBSet(), "ChallengeId", "ChallengeId");
-            return View();
-        }
-
-        // POST: UserChallenges/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserChallengeId,UserId,ChallengeId,PercentageComplete")] UserChallenge userChallenge)
-        {
-            if (ModelState.IsValid)
-            {
-                await _userChallengeRepository.AddAsync(userChallenge);
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ChallengeId"] = new SelectList(_challengeRepository.GetDBSet(), "ChallengeId", "ChallengeId", userChallenge.ChallengeId);
-            return View(userChallenge);
-        }
-
-        
-
         // GET: UserChallenges/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

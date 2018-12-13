@@ -4,6 +4,7 @@ using challenges.Models;
 using challenges.Repositories;
 using challengesTest.TestUtilities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using YourApp.Services;
@@ -17,6 +18,7 @@ namespace challengesTest.Controllers.api
         private readonly Mock<IChallengeRepository> _challengesRepository;
         private readonly Mock<IActivityRepository> _activityRepository;
         private readonly ApiClient apiClient;
+        
 
         private string testGroupId = "55";
 
@@ -25,8 +27,9 @@ namespace challengesTest.Controllers.api
             _userChallengeRepository = new Mock<IUserChallengeRepository>();
             _challengesRepository = new Mock<IChallengeRepository>();
             _activityRepository = new Mock<IActivityRepository>();
+            var config = new ConfigurationBuilder().Build();
             _controller = new ChallengesController(_challengesRepository.Object, _userChallengeRepository.Object,
-                _activityRepository.Object, apiClient);
+                _activityRepository.Object, apiClient, config);
         }
 
         [Fact]
