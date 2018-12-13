@@ -16,6 +16,7 @@ namespace challenges.Models
         [Display(Name = "End Date Time")]
         public virtual DateTime EndDateTime { get; set; }
 
+        [Range(0, double.MaxValue, ErrorMessage = "The goal value must be greater than 0")]
         public virtual int Goal { get; set; }
 
         public virtual GoalMetric GoalMetric { get; set; }
