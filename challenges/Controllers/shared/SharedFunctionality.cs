@@ -16,8 +16,7 @@ namespace challenges.Controllers.shared
         private static IApiClient _apiClient;
         private static string _hdrUrl;
         
-        public static void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient, string hdrUrl)
-        public void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient)
+        public void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient, string hdrUrl)
         {
             _userChallengeRepository = userChallengeRepository;
             _apiClient = apiClient;
@@ -43,7 +42,7 @@ namespace challenges.Controllers.shared
 
                 if (DateTime.Compare(challengeStartDate, todayDate) <= 0)
                 {
-                    var userData = await _apiClient.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/Activities/ByUser/"
+                    var userData = await _apiClient.GetAsync(_hdrUrl+ "api/Activities/ByUser/"
                                                           + c.UserId + "?from=" + challengeStartDate.ToString("yyyy-MM-dd") + "&to=" + dateSelected.Date.ToString("yyyy-MM-dd"));
                     if (userData.IsSuccessStatusCode)
                     {

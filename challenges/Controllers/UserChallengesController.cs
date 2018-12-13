@@ -44,12 +44,9 @@ namespace challenges.Controllers
             if (isAdminOrCoord())
             {
                 var challengesContext = await _userChallengeRepository.GetAllAsync();
-                SharedFunctionality.Init(_userChallengeRepository, client, _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
-                SharedFunctionality.UpdatePercentageListAsync(challengesContext);
-                challengesContext = await _userChallengeRepository.GetAllAsync();
 
                 var SF = new SharedFunctionality();
-                SF.Init(_userChallengeRepository, client);
+                SF.Init(_userChallengeRepository, client,  _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
                 challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
 
                 //challengesContext = await _userChallengeRepository.GetAllAsync();
@@ -76,16 +73,13 @@ namespace challenges.Controllers
                 }
                 return View(challengesContext);
             } else
-            
+
             {
 
                 var challengesContext = await _userChallengeRepository.GetByUId(userId);
-                
-                SharedFunctionality.Init(_userChallengeRepository, client, _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
-                SharedFunctionality.UpdatePercentageListAsync(challengesContext);
 
                 var SF = new SharedFunctionality();
-                SF.Init(_userChallengeRepository, client);
+                SF.Init(_userChallengeRepository, client, _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
                 challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
 
                 //challengesContext =  await _userChallengeRepository.GetByUId(userId);
