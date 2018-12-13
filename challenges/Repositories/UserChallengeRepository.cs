@@ -90,7 +90,13 @@ namespace challenges.Repositories
 
         public async Task<UserChallenge> DeleteAsync(UserChallenge userChallenge)
         {
-            _context.UserChallenge.Remove(userChallenge);
+
+            if (!userChallenge.Challenge.IsGroupChallenge) {
+                _context.Challenge.Remove(userChallenge.Challenge);
+            }
+            else {
+                _context.UserChallenge.Remove(userChallenge);
+            }
             await _context.SaveChangesAsync();
             return userChallenge;
         }
