@@ -127,12 +127,6 @@ namespace challenges.Controllers
                 ChallengeId = challenge.ChallengeId
             };
 
-            if (isAdminOrCoord() && !challenge.IsGroupChallenge)
-            {
-                ModelState.AddModelError("IsGroupChallenge","Must be a group challenge.");
-            }
-
-
             if (ModelState.IsValid)
             {
                 
@@ -141,8 +135,6 @@ namespace challenges.Controllers
                 {
                     await _userChallengeRepository.AddAsync(user);
                 }
-
-                //await _context.SaveChangesAsync(); //TODO Tidy
 
                 if (challenge.IsGroupChallenge)
                 {
