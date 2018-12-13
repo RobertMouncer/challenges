@@ -14,20 +14,20 @@ namespace challenges.Controllers.shared
     {
         private static IUserChallengeRepository _userChallengeRepository;
         private static IApiClient _apiClient;
-
-        private static readonly string HdrUrl = Environment.GetEnvironmentVariable("Challenges__HealthDataRepositoryUrl");
+        private static string _hdrUrl;
         
-        public static void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient)
+        public static void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient, string hdrUrl)
         {
             _userChallengeRepository = userChallengeRepository;
             _apiClient = apiClient;
+            _hdrUrl = hdrUrl;
         }
 
         public static async void UpdatePercentageListAsync(List<UserChallenge> userChallenges)
         {
             foreach(var c in userChallenges)
             {
-                var userData = await _apiClient.GetAsync(HdrUrl + "api/Activities/ByUser/" 
+                var userData = await _apiClient.GetAsync(_hdrUrl + "api/Activities/ByUser/" 
                                                       + c.UserId + "?from=" + c.Challenge.StartDateTime.Date + "&to=" + DateTime.Now.Date);
 
                 var userDataResult = userData.Content.ReadAsStringAsync().Result;

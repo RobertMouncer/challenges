@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using YourApp.Services;
 
 namespace challenges.Controllers.api
@@ -23,15 +24,17 @@ namespace challenges.Controllers.api
         private readonly IUserChallengeRepository _userChallengeRepository;
         private readonly IActivityRepository _activityRepository;
         private readonly IApiClient _client;
+        private readonly IConfigurationSection _appConfig;
 
         public ChallengesController(IChallengeRepository challengeRepository, 
             IUserChallengeRepository userChallengeRepository, IActivityRepository activityRepository,
-            IApiClient client)
+            IApiClient client, IConfiguration config)
         {
             _challengeRepository = challengeRepository;
             _userChallengeRepository = userChallengeRepository;
             _activityRepository = activityRepository;
             _client = client;
+            _appConfig = config.GetSection("Challenges");
         }
 
         [HttpPost]
@@ -64,7 +67,7 @@ namespace challenges.Controllers.api
             if (userChallenges == null)
                 return Ok(new List<object>());
 
-            SharedFunctionality.Init(_userChallengeRepository, _client);
+            SharedFunctionality.Init(_userChallengeRepository, _client, _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
             SharedFunctionality.UpdatePercentageListAsync(userChallenges);
 
             userChallenges = await _userChallengeRepository.GetGroupByUid(uid);
@@ -81,7 +84,7 @@ namespace challenges.Controllers.api
             
                 return Ok(new List<object>());
             }
-            SharedFunctionality.Init(_userChallengeRepository, _client);
+            SharedFunctionality.Init(_userChallengeRepository, _client, _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
             SharedFunctionality.UpdatePercentageListAsync(userChallenges);
 
             userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);

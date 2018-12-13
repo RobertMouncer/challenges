@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using YourApp.Services;
 using Newtonsoft.Json;
 //Index page will be used to display group challenges that users can join. The create function will be used by the userChallenge to create a challenge for the user.
@@ -22,18 +23,17 @@ namespace challenges.Controllers
         private readonly IActivityRepository _activityRepository;
         private readonly IGoalMetricRepository _goalMetricRepository;
         private readonly IApiClient client;
-
-        private string userGroupUrl;
+        private readonly IConfigurationSection _appConfig;
 
         public ChallengesManageController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
-            IActivityRepository activityRepository, IGoalMetricRepository goalMetricRepository, IApiClient client)
+            IActivityRepository activityRepository, IGoalMetricRepository goalMetricRepository, IApiClient client, IConfiguration config)
         {
             _goalMetricRepository = goalMetricRepository;
             _userChallengeRepository = userChallengeRepository;
             _challengeRepository = challengeRepository;
             _activityRepository = activityRepository;
             this.client = client;
-            userGroupUrl = Environment.GetEnvironmentVariable("Challenges__UserGroupsUrl");
+            _appConfig = config.GetSection("Challenges");
         }
 
         
@@ -47,7 +47,7 @@ namespace challenges.Controllers
 
                 foreach(var c in challengesContext)
                 {
-                    var groupResponse = await client.GetAsync(userGroupUrl + "api/groups/" + c.Groupid);
+                    var groupResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups/" + c.Groupid);
                     var group = groupResponse.Content.ReadAsStringAsync().Result;
                     dynamic data = JsonConvert.DeserializeObject(group);
                     c.Groupid = data.name;
@@ -58,7 +58,7 @@ namespace challenges.Controllers
             else
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
-                var groupResponse = await client.GetAsync(userGroupUrl + "api/groups/ForUser/" + userId);
+                var groupResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups/ForUser/" + userId);
                 var group = groupResponse.Content.ReadAsStringAsync().Result;
                 dynamic data = JsonConvert.DeserializeObject(group);
                 string groupId;
@@ -94,7 +94,7 @@ namespace challenges.Controllers
         // GET: Challenges/Create
         public async Task<IActionResult> Create()
         {
-            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
+            var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
@@ -154,7 +154,7 @@ namespace challenges.Controllers
                 return RedirectToAction("Index", "UserChallenges");
             }
 
-            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
+            var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
@@ -179,7 +179,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
+            var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
@@ -249,7 +249,7 @@ namespace challenges.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
+            var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
