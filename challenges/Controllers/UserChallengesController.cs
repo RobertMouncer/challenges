@@ -40,9 +40,12 @@ namespace challenges.Controllers
             if (isAdminOrCoord())
             {
                 var challengesContext = await _userChallengeRepository.GetAllAsync();
-                SharedFunctionality.Init(_userChallengeRepository, client);
-                SharedFunctionality.UpdatePercentageListAsync(challengesContext);
-                challengesContext = await _userChallengeRepository.GetAllAsync();
+
+                var SF = new SharedFunctionality();
+                SF.Init(_userChallengeRepository, client);
+                challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
+
+                //challengesContext = await _userChallengeRepository.GetAllAsync();
 
                 List<string> userList = new List<string>();
 
@@ -70,11 +73,12 @@ namespace challenges.Controllers
             {
 
                 var challengesContext = await _userChallengeRepository.GetByUId(userId);
-                
-                SharedFunctionality.Init(_userChallengeRepository, client);
-                SharedFunctionality.UpdatePercentageListAsync(challengesContext);
 
-                challengesContext =  await _userChallengeRepository.GetByUId(userId);
+                var SF = new SharedFunctionality();
+                SF.Init(_userChallengeRepository, client);
+                challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
+
+                //challengesContext =  await _userChallengeRepository.GetByUId(userId);
 
                 return View(challengesContext);
             }
@@ -130,7 +134,7 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var userChallenge = await _userChallengeRepository.FindByIdAsync(id);
+            var userChallenge = await _userChallengeRepository.GetByIdAsync(id);
             await _userChallengeRepository.DeleteAsync(userChallenge);
             return RedirectToAction(nameof(Index));
         }
