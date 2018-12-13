@@ -64,8 +64,9 @@ namespace challenges.Controllers.api
             if (userChallenges == null)
                 return Ok(new List<object>());
 
-            SharedFunctionality.Init(_userChallengeRepository, _client);
-            SharedFunctionality.UpdatePercentageListAsync(userChallenges);
+            var SF = new SharedFunctionality();
+            SF.Init(_userChallengeRepository, _client);
+            await SF.UpdatePercentageListAsync(userChallenges);
 
             userChallenges = await _userChallengeRepository.GetGroupByUid(uid);
 
@@ -81,8 +82,10 @@ namespace challenges.Controllers.api
             
                 return Ok(new List<object>());
             }
-            SharedFunctionality.Init(_userChallengeRepository, _client);
-            SharedFunctionality.UpdatePercentageListAsync(userChallenges);
+
+            var SF = new SharedFunctionality();
+            SF.Init(_userChallengeRepository, _client);
+            userChallenges=  await SF.UpdatePercentageListAsync(userChallenges);
 
             userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
 

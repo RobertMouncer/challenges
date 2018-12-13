@@ -15,31 +15,54 @@ namespace challenges.Controllers.shared
         private static IUserChallengeRepository _userChallengeRepository;
         private static IApiClient _apiClient;
         
-        public static void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient)
+        public void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient)
         {
             _userChallengeRepository = userChallengeRepository;
             _apiClient = apiClient;
         }
 
-        public static async void UpdatePercentageListAsync(List<UserChallenge> userChallenges)
+        public async Task<List<UserChallenge>> UpdatePercentageListAsync(List<UserChallenge> userChallenges)
         {
-            foreach(var c in userChallenges)
+
+            
+            var todayDate = DateTime.Now;
+            foreach (var c in userChallenges)
             {
-                var userData = await _apiClient.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/Activities/ByUser/" 
-                                                      + c.UserId + "?from=" + c.Challenge.StartDateTime.Date + "&to=" + DateTime.Now.Date);
+                var challengeStartDate = c.Challenge.StartDateTime;
+                var challengeEndDate = c.Challenge.EndDateTime;
+                var dateSelected = todayDate;
 
-                var userDataResult = userData.Content.ReadAsStringAsync().Result;
+                if(DateTime.Compare(challengeEndDate, todayDate) <= 0)
+                {
+                    dateSelected = challengeEndDate;
+                }
 
-                await UpdatePercentageCompleteAsync(c, userDataResult);
+
+                if (DateTime.Compare(challengeStartDate, todayDate) <= 0)
+                {
+                    var userData = await _apiClient.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/Activities/ByUser/"
+                                                          + c.UserId + "?from=" + challengeStartDate.ToString("yyyy-MM-dd") + "&to=" + dateSelected.Date.ToString("yyyy-MM-dd"));
+                    if (userData.IsSuccessStatusCode)
+                    {
+                        var userDataResult = userData.Content.ReadAsStringAsync().Result;
+
+                        await UpdatePercentageCompleteAsync(c, userDataResult);
+                    }
+
+                }
 
             }
+            return userChallenges;
         }
         
         //this is also awful, please change
-        public static async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
+        public async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
         {
             if(userDataString == "[]" || userDataString == null)
             {
+                userChallenge.PercentageComplete = 0;
+
+                await _userChallengeRepository.UpdateAsync(userChallenge);
                 return userChallenge;
             }
             dynamic dataString = JsonConvert.DeserializeObject(userDataString);
@@ -52,30 +75,29 @@ namespace challenges.Controllers.shared
                     switch (userChallenge.Challenge.GoalMetric.GoalMetricDbName)
                     {
                         case "caloriesBurnt":
-                            progress += d.caloriesBurnt;
+                            progress += (int)d.caloriesBurnt;
                             break;
                         case "averageHeartRate":
-                            progress += d.averageHeartRate;
+                            progress += (int)d.averageHeartRate;
                             break;
                         case "stepsTaken":
-                            progress += d.stepsTaken;
+                            progress += (int)d.stepsTaken;
                             break;
                         case "metresTravelled":
-                            progress += d.metresTravelled;
+                            progress += (int)d.metresTravelled;
                             break;
                         case "metresElevationGained":
-                            progress += d.metresElevationGained;
+                            progress += (int)d.metresElevationGained;
                             break;
                         default:
-                            progress = 0;
                             break;
                     }
                 }
             }
 
-            var percentageComplete = (progress / userChallenge.Challenge.Goal)*100;
+            double percentageComplete = ((double)progress / (double)userChallenge.Challenge.Goal)*100;
             
-            userChallenge.PercentageComplete = Math.Min(100, percentageComplete);
+            userChallenge.PercentageComplete = Math.Min(100, (int)percentageComplete);
 
             await _userChallengeRepository.UpdateAsync(userChallenge);
 
