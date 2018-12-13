@@ -23,6 +23,8 @@ namespace challenges.Controllers
         private readonly IGoalMetricRepository _goalMetricRepository;
         private readonly IApiClient client;
 
+        private string userGroupUrl;
+
         public ChallengesManageController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
             IActivityRepository activityRepository, IGoalMetricRepository goalMetricRepository, IApiClient client)
         {
@@ -31,6 +33,7 @@ namespace challenges.Controllers
             _challengeRepository = challengeRepository;
             _activityRepository = activityRepository;
             this.client = client;
+            userGroupUrl = Environment.GetEnvironmentVariable("Challenges__UserGroupsUrl");
         }
 
         
@@ -44,7 +47,7 @@ namespace challenges.Controllers
 
                 foreach(var c in challengesContext)
                 {
-                    var groupResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups/" + c.Groupid);
+                    var groupResponse = await client.GetAsync(userGroupUrl + "api/groups/" + c.Groupid);
                     var group = groupResponse.Content.ReadAsStringAsync().Result;
                     dynamic data = JsonConvert.DeserializeObject(group);
                     c.Groupid = data.name;
@@ -55,7 +58,7 @@ namespace challenges.Controllers
             else
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
-                var groupResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups/ForUser/" + userId);
+                var groupResponse = await client.GetAsync(userGroupUrl + "api/groups/ForUser/" + userId);
                 var group = groupResponse.Content.ReadAsStringAsync().Result;
                 dynamic data = JsonConvert.DeserializeObject(group);
                 string groupId;
@@ -91,7 +94,7 @@ namespace challenges.Controllers
         // GET: Challenges/Create
         public async Task<IActionResult> Create()
         {
-            var groupsResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups");
+            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
@@ -151,7 +154,7 @@ namespace challenges.Controllers
                 return RedirectToAction("Index", "UserChallenges");
             }
 
-            var groupsResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups");
+            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
@@ -176,7 +179,7 @@ namespace challenges.Controllers
                 return NotFound();
             }
 
-            var groupsResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups");
+            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 
@@ -246,7 +249,7 @@ namespace challenges.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            var groupsResponse = await client.GetAsync("https://docker2.aberfitness.biz/user-groups/api/groups");
+            var groupsResponse = await client.GetAsync(userGroupUrl + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
 

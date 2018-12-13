@@ -22,6 +22,8 @@ namespace challenges.Controllers
         private readonly IActivityRepository _activityRepository;
         private readonly IApiClient client;
 
+        private readonly string _hdrUrl = Environment.GetEnvironmentVariable("Challenges__HealthDataRepositoryUrl");
+
         public ActivitiesController(IActivityRepository activityRepository, IApiClient client)
         {
             _activityRepository = activityRepository;
@@ -55,8 +57,7 @@ namespace challenges.Controllers
         // GET: Activities/Create
         public async Task<IActionResult> Create()
         {
-
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activities = await client.GetAsync(_hdrUrl + "api/ActivityTypes");
             var activitiesContent = activities.Content.ReadAsStringAsync().Result;
             var items = GetActivities(activitiesContent);
 
@@ -76,8 +77,7 @@ namespace challenges.Controllers
                 ModelState.AddModelError("ActivityName", "Activity already exists. Please enter another activity.");
             }
 
-
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activities = await client.GetAsync(_hdrUrl + "api/ActivityTypes");
             var activitiesContent = activities.Content.ReadAsStringAsync().Result;
 
             activity.DbActivityId = FindDbId(activity.ActivityName, activitiesContent);

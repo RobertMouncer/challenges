@@ -14,6 +14,8 @@ namespace challenges.Controllers.shared
     {
         private static IUserChallengeRepository _userChallengeRepository;
         private static IApiClient _apiClient;
+
+        private static readonly string HdrUrl = Environment.GetEnvironmentVariable("Challenges__HealthDataRepositoryUrl");
         
         public static void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient)
         {
@@ -25,7 +27,7 @@ namespace challenges.Controllers.shared
         {
             foreach(var c in userChallenges)
             {
-                var userData = await _apiClient.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/Activities/ByUser/" 
+                var userData = await _apiClient.GetAsync(HdrUrl + "api/Activities/ByUser/" 
                                                       + c.UserId + "?from=" + c.Challenge.StartDateTime.Date + "&to=" + DateTime.Now.Date);
 
                 var userDataResult = userData.Content.ReadAsStringAsync().Result;

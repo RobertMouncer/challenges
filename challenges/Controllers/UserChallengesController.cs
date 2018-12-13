@@ -23,6 +23,8 @@ namespace challenges.Controllers
         private readonly IChallengeRepository _challengeRepository;
         private readonly IApiClient client;
 
+        private readonly string _gatekeeperUrl = Environment.GetEnvironmentVariable("Challenges__GatekeeperUrl");
+
         public UserChallengesController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, IApiClient client)
         {
             _userChallengeRepository = userChallengeRepository;
@@ -51,7 +53,7 @@ namespace challenges.Controllers
                     userList.Add(u.UserId);
                 }
                 
-                var response = await client.PostAsync("https://docker2.aberfitness.biz/gatekeeper/api/Users/Batch", userList.Distinct());
+                var response = await client.PostAsync(_gatekeeperUrl + "api/Users/Batch", userList.Distinct());
                 JArray jsonArrayOfUsers = JArray.Parse(await response.Content.ReadAsStringAsync());
 
                 foreach (UserChallenge u in challengesContext)
