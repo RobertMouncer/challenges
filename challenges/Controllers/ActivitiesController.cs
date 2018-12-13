@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using YourApp.Services;
 using Newtonsoft.Json;
 
@@ -21,11 +22,13 @@ namespace challenges.Controllers
     {
         private readonly IActivityRepository _activityRepository;
         private readonly IApiClient client;
+        private readonly IConfigurationSection _appConfig;
 
-        public ActivitiesController(IActivityRepository activityRepository, IApiClient client)
+        public ActivitiesController(IActivityRepository activityRepository, IApiClient client, IConfiguration config)
         {
             _activityRepository = activityRepository;
             this.client = client;
+            _appConfig = config.GetSection("Challenges");
         }
 
         // GET: Activities
@@ -55,8 +58,7 @@ namespace challenges.Controllers
         // GET: Activities/Create
         public async Task<IActionResult> Create()
         {
-
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activities = await client.GetAsync(_appConfig.GetValue<string>("HealthDataRepositoryUrl") + "api/ActivityTypes");
             var activitiesContent = activities.Content.ReadAsStringAsync().Result;
             var items = GetActivities(activitiesContent);
 
@@ -76,8 +78,7 @@ namespace challenges.Controllers
                 ModelState.AddModelError("ActivityName", "Activity already exists. Please enter another activity.");
             }
 
-
-            var activities = await client.GetAsync("https://docker2.aberfitness.biz/health-data-repository/api/ActivityTypes");
+            var activities = await client.GetAsync(_appConfig.GetValue<string>("HealthDataRepositoryUrl") + "api/ActivityTypes");
             var activitiesContent = activities.Content.ReadAsStringAsync().Result;
 
             activity.DbActivityId = FindDbId(activity.ActivityName, activitiesContent);

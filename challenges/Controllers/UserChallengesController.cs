@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using YourApp.Services;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
@@ -22,12 +23,15 @@ namespace challenges.Controllers
         private readonly IUserChallengeRepository _userChallengeRepository;
         private readonly IChallengeRepository _challengeRepository;
         private readonly IApiClient client;
+        private readonly IConfigurationSection _appConfig;
 
-        public UserChallengesController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, IApiClient client)
+        public UserChallengesController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
+            IApiClient client, IConfiguration config)
         {
             _userChallengeRepository = userChallengeRepository;
             _challengeRepository = challengeRepository;
             this.client = client;
+            _appConfig = config.GetSection("Challenges");
         }
 
         // GET: UserChallenges
@@ -42,7 +46,7 @@ namespace challenges.Controllers
                 var challengesContext = await _userChallengeRepository.GetAllAsync();
 
                 var SF = new SharedFunctionality();
-                SF.Init(_userChallengeRepository, client);
+                SF.Init(_userChallengeRepository, client,  _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
                 challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
 
                 //challengesContext = await _userChallengeRepository.GetAllAsync();
@@ -54,7 +58,7 @@ namespace challenges.Controllers
                     userList.Add(u.UserId);
                 }
                 
-                var response = await client.PostAsync("https://docker2.aberfitness.biz/gatekeeper/api/Users/Batch", userList.Distinct());
+                var response = await client.PostAsync(_appConfig.GetValue<string>("GatekeeperUrl") + "api/Users/Batch", userList.Distinct());
                 JArray jsonArrayOfUsers = JArray.Parse(await response.Content.ReadAsStringAsync());
 
                 foreach (UserChallenge u in challengesContext)
@@ -69,13 +73,13 @@ namespace challenges.Controllers
                 }
                 return View(challengesContext);
             } else
-            
+
             {
 
                 var challengesContext = await _userChallengeRepository.GetByUId(userId);
 
                 var SF = new SharedFunctionality();
-                SF.Init(_userChallengeRepository, client);
+                SF.Init(_userChallengeRepository, client, _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
                 challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
 
                 //challengesContext =  await _userChallengeRepository.GetByUId(userId);
