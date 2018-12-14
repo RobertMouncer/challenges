@@ -143,9 +143,9 @@ namespace challengesTest.Repositories
         [Fact]
         public async void GetAllPersonalChallenges()
         {
-            var create = 10;
+            var amount = 10;
             var userid = "user123";
-            var userChallenge = ChallengesGenerator.CreateList(create, true);
+            var userChallenge = ChallengesGenerator.CreateList(amount, false);
             for (int i = 0; i < 10; i++)
             {
                 userChallenge[i].UserId = userid;
@@ -157,13 +157,13 @@ namespace challengesTest.Repositories
                 context.UserChallenge.AddRange(userChallenge);
                 context.SaveChanges();
 
-                Assert.Equal(create, await context.UserChallenge.CountAsync());
+                Assert.Equal(amount, await context.UserChallenge.CountAsync());
 
                 var repository = new UserChallengeRepository(context);
 
                 var uc = await repository.GetAllPersonalChallenges(userid);
                 Assert.IsType<List<UserChallenge>>(uc);
-                Assert.Equal(10, uc.Count);
+                Assert.Equal(amount, uc.Count);
             }
         }
     }

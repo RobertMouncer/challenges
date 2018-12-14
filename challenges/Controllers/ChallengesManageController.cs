@@ -74,23 +74,6 @@ namespace challenges.Controllers
 
         }
 
-        // GET: Challenges/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var challenge = await _challengeRepository.GetByIdIncAsync((int) id);
-            if (challenge == null)
-            {
-                return NotFound();
-            }
-
-            return View(challenge);
-        }
-
         // GET: Challenges/Create
         public async Task<IActionResult> Create()
         {
