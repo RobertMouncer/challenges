@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using challenges.Data;
 
 namespace challenges.Migrations
 {
     [DbContext(typeof(challengesContext))]
-    partial class ChallengesContextModelSnapshot : ModelSnapshot
+    [Migration("20181214183014_added_email_sent_to_userChallenge")]
+    partial class added_email_sent_to_userChallenge
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
