@@ -8,6 +8,7 @@ namespace challenges.Repositories
 {
     public interface IUserChallengeRepository
     {
+        Task<List<UserChallenge>> GetAllToSendEmail();
         Task<UserChallenge> FindByIdAsync(int id);
         
         Task<UserChallenge> GetByIdAsync(int id);

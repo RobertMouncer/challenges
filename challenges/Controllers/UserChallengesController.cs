@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using challenges.Controllers.shared;
 using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -45,12 +44,6 @@ namespace challenges.Controllers
             {
                 var challengesContext = await _userChallengeRepository.GetAllAsync();
 
-                var SF = new SharedFunctionality();
-                SF.Init(_userChallengeRepository, client,  _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
-                challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
-
-                //challengesContext = await _userChallengeRepository.GetAllAsync();
-
                 List<string> userList = new List<string>();
 
                 foreach (UserChallenge u in challengesContext)
@@ -77,12 +70,6 @@ namespace challenges.Controllers
             {
 
                 var challengesContext = await _userChallengeRepository.GetByUId(userId);
-
-                var SF = new SharedFunctionality();
-                SF.Init(_userChallengeRepository, client, _appConfig.GetValue<string>("HealthDataRepositoryUrl"));
-                challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
-
-                //challengesContext =  await _userChallengeRepository.GetByUId(userId);
 
                 return View(challengesContext);
             }
@@ -127,47 +114,5 @@ namespace challenges.Controllers
             return (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator"));
         }
 
-        //this is also awful, please change
-        /*private async Task<UserChallenge> UpdatePercentageCompleteAsync(UserChallenge userChallenge, string userDataString)
-        {
-            dynamic dataString = JsonConvert.DeserializeObject(userDataString);
-            var progress = 0;
-
-            foreach (var d in dataString)
-            {
-                var activityTypeId = d.activityTypeId;
-                if (activityTypeId == userChallenge.Challenge.Activity.DbActivityId)
-                {
-                    switch (userChallenge.Challenge.GoalMetric.GoalMetricDbName)
-                    {
-                        //TODO CHANGE THIS TO BE NICER
-                        case "CaloriesBurnt":
-                            progress += (int)d.caloriesBurnt;
-                            break;
-                        case "AverageHeartRate":
-                            progress += (int)d.averageHeartRate;
-                            break;
-                        case "StepsTaken":
-                            progress += (int)d.stepsTaken;
-                            break;
-                        case "MetresTravelled":
-                            progress += (int)d.metresTravelled;
-                            break;
-                        case "MetresElevationGained":
-                            progress += (int)d.metresElevationGained;
-                            break;
-                    }
-                }
-            }
-
-
-            double percentageComplete = ((double)progress / (double)userChallenge.Challenge.Goal)*100;
-
-            userChallenge.PercentageComplete = (int)Math.Min(100, percentageComplete);
-
-            await _userChallengeRepository.UpdateAsync(userChallenge);
-
-            return userChallenge;
-        }*/
     }
 }

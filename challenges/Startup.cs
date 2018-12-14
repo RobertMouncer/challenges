@@ -1,4 +1,5 @@
 ﻿using challenges.Models;
+using challenges.Controllers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,9 @@ using YourApp.Services;
 using System.Net;
 using challenges.Data;
 using challenges.Repositories;
+using Hangfire;
+using Hangfire.MySql;
+using challenges.Controllers.shared;
 
 namespace challenges
 {
@@ -32,6 +36,7 @@ namespace challenges
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHangfire(x => x.UseStorage(new MySqlStorage(Configuration.GetConnectionString("challengesContext"), new MySqlStorageOptions())));
             services.AddScoped<IUserChallengeRepository, UserChallengeRepository>();
             services.AddScoped<IChallengeRepository, ChallengeRepository>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
@@ -129,7 +134,7 @@ namespace challenges
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
+            app.UseHangfireServer();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -141,6 +146,9 @@ namespace challenges
                     name: "default",
                     template: "{controller=UserChallenges}/{action=Index}/{id?}");
             });
+
+            RecurringJob.AddOrUpdate<SharedFunctionality>(x => x.UpdateAllPercentageComplete(), Cron.MinuteInterval(5));
+            RecurringJob.AddOrUpdate<SharedFunctionality>(x => x.SendEmail(), Cron.MinuteInterval(5));
         }
 
         private void RunMigrations(IApplicationBuilder app)
