@@ -36,7 +36,7 @@ namespace challenges
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHangfire(x => x.UseStorage(new MySqlStorage(Configuration.GetConnectionString("challengesContext"), new MySqlStorageOptions())));
+            
             services.AddScoped<IUserChallengeRepository, UserChallengeRepository>();
             services.AddScoped<IChallengeRepository, ChallengeRepository>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
@@ -93,7 +93,7 @@ namespace challenges
 
             services.AddDbContext<challengesContext>(options =>
                     options.UseMySql(Configuration.GetConnectionString("challengesContext")));
-
+            services.AddHangfire(x => x.UseStorage(new MySqlStorage(Configuration.GetConnectionString("challengesContext"), new MySqlStorageOptions())));
             if (!_environment.IsDevelopment())
             {
                 services.Configure<ForwardedHeadersOptions>(options =>
