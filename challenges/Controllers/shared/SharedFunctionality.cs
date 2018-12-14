@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using challenges.Models;
 using challenges.Repositories;
@@ -119,11 +120,19 @@ namespace challenges.Controllers.shared
             foreach(UserChallenge uc in userchallenges)
             {
                 var outcome = uc.PercentageComplete == 100 ? "Completed" : "Failed";
-                var content = "You " + outcome + " your challenge to complete " + uc.Challenge.Goal + " " + uc.Challenge.GoalMetric.GoalMetricDisplay + " while doing " + uc.Challenge.Activity.ActivityName + " between the dates " + uc.Challenge.StartDateTime  + " - " + uc.Challenge.EndDateTime + ".";
+
+                var emailContent = new StringBuilder();
+                emailContent.AppendLine("<p>Member,</p>");
+                emailContent.AppendLine("<p>You've " + outcome + " your challenge!:</p>");
+                emailContent.AppendLine("<p>Your goal was " + uc.Challenge.Goal + " " + uc.Challenge.GoalMetric.GoalMetricDbName + ".</p>");
+                emailContent.AppendLine("<p>The activity was " + uc.Challenge.Activity.ActivityName + ".</p>");
+                emailContent.AppendLine("<p>Between Dates " + uc.Challenge.StartDateTime + " and " + uc.Challenge.EndDateTime + ".</p>");
+                emailContent.AppendLine();
+
                 var payload = new
                 {
                     Subject = "Challenge " + outcome,
-                    Content = content,
+                    Content = emailContent,
                     UserId = uc.UserId
                 };
                 uc.EmailSent = true;
