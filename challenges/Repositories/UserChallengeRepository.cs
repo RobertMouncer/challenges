@@ -40,6 +40,17 @@ namespace challenges.Repositories
                 .ThenInclude(c => c.Activity)
                 .ToListAsync();
         }
+        public async Task<List<UserChallenge>> GetAllToSendEmail()
+        {
+            return await _context.UserChallenge
+                .Include(c => c.Challenge.GoalMetric)
+                .Include(b => b.Challenge)
+                .ThenInclude(c => c.Activity)
+                .Where(uc => !uc.EmailSent 
+                && DateTime.Compare(DateTime.Now,uc.Challenge.EndDateTime) > 0)
+                .ToListAsync();
+        }
+
 
         public async Task<List<UserChallenge>> GetByUId(string userId)
         {

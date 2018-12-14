@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
-using challenges.Migrations;
 using challenges.Models;
 using challenges.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using YourApp.Services;
 
@@ -12,15 +12,15 @@ namespace challenges.Controllers.shared
 {
     public class SharedFunctionality
     {
-        private static IUserChallengeRepository _userChallengeRepository;
-        private static IApiClient _apiClient;
-        private static string _hdrUrl;
-        
-        public void Init(IUserChallengeRepository userChallengeRepository, IApiClient apiClient, string hdrUrl)
+        private  IUserChallengeRepository userChallengeRepository;
+        private  IApiClient apiClient;
+        private  IConfigurationSection appConfig;
+
+        public SharedFunctionality(IUserChallengeRepository userChallengeRepository, IApiClient apiClient, IConfiguration appConfig)
         {
-            _userChallengeRepository = userChallengeRepository;
-            _apiClient = apiClient;
-            _hdrUrl = hdrUrl;
+            this.userChallengeRepository = userChallengeRepository;
+            this.apiClient = apiClient;
+            this.appConfig = appConfig.GetSection("Challenges");
         }
 
         public async Task<List<UserChallenge>> UpdatePercentageListAsync(List<UserChallenge> userChallenges)
@@ -42,7 +42,7 @@ namespace challenges.Controllers.shared
 
                 if (DateTime.Compare(challengeStartDate, todayDate) <= 0)
                 {
-                    var userData = await _apiClient.GetAsync(_hdrUrl+ "api/Activities/ByUser/"
+                    var userData = await apiClient.GetAsync(appConfig.GetValue<string>("HealthDataRepositoryUrl") + "api/Activities/ByUser/"
                                                           + c.UserId + "?from=" + challengeStartDate.ToString("yyyy-MM-dd") + "&to=" + dateSelected.Date.ToString("yyyy-MM-dd"));
                     if (userData.IsSuccessStatusCode)
                     {
@@ -64,7 +64,7 @@ namespace challenges.Controllers.shared
             {
                 userChallenge.PercentageComplete = 0;
 
-                await _userChallengeRepository.UpdateAsync(userChallenge);
+                await userChallengeRepository.UpdateAsync(userChallenge);
                 return userChallenge;
             }
             dynamic dataString = JsonConvert.DeserializeObject(userDataString);
@@ -101,9 +101,45 @@ namespace challenges.Controllers.shared
             
             userChallenge.PercentageComplete = Math.Min(100, (int)percentageComplete);
 
-            await _userChallengeRepository.UpdateAsync(userChallenge);
+            await userChallengeRepository.UpdateAsync(userChallenge);
 
             return userChallenge;
+        }
+
+        public async Task UpdateAllPercentageComplete()
+        {
+            var userchallenges = await userChallengeRepository.GetAllAsync();
+            await UpdatePercentageListAsync(userchallenges);
+
+        }
+
+        public async Task SendEmail()
+        {
+            var userchallenges = await userChallengeRepository.GetAllToSendEmail();
+
+            foreach(UserChallenge uc in userchallenges)
+            {
+                var outcome = uc.PercentageComplete == 100 ? "Completed" : "Failed";
+
+                var emailContent = new StringBuilder();
+                emailContent.AppendLine("<p>Member,</p>");
+                emailContent.AppendLine("<p>You've " + outcome + " your challenge!:</p>");
+                emailContent.AppendLine("<p>Your goal was " + uc.Challenge.Goal + " " + uc.Challenge.GoalMetric.GoalMetricDbName + ".</p>");
+                emailContent.AppendLine("<p>The activity was " + uc.Challenge.Activity.ActivityName + ".</p>");
+                emailContent.AppendLine("<p>Between Dates " + uc.Challenge.StartDateTime + " and " + uc.Challenge.EndDateTime + ".</p>");
+                emailContent.AppendLine();
+
+                var payload = new
+                {
+                    Subject = "Challenge " + outcome,
+                    Content = emailContent,
+                    UserId = uc.UserId
+                };
+                uc.EmailSent = true;
+                await userChallengeRepository.UpdateAsync(uc);
+                var userData = await apiClient.PostAsync(appConfig.GetValue<string>("CommsUrl") + "api/Email/ToUser/",payload);
+            }
+
         }
     }
 }

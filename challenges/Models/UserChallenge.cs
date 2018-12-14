@@ -13,5 +13,6 @@ namespace challenges.Models
         public virtual Challenge Challenge { get; set; }
         public virtual int ChallengeId { get; set; }
         public virtual int PercentageComplete { get; set; }
+        public virtual bool EmailSent { get; set; }
     }
 }

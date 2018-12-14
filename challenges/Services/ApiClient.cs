@@ -46,7 +46,7 @@ namespace YourApp.Services
                 // The ApiResourceName of the resources you want to access.
                 // Other valid values might be `comms`, `health_data_repository`, etc.
                 // Ask in #dev-gatekeeper for help
-                Scope = "user_groups gatekeeper health_data_repository"
+                Scope = "user_groups gatekeeper health_data_repository comms"
 
             };
 
