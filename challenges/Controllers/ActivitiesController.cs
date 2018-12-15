@@ -86,8 +86,8 @@ namespace challenges.Controllers
             
             if (ModelState.IsValid)
             {
-                await _activityRepository.AddAsync(activity);
-                await auditLogger.log(getUserId(), $"Created activity: {activity.ActivityId}");
+                activity = await _activityRepository.AddAsync(activity);
+                await auditLogger.log(getUserId(), $"Created activity: {activity.ActivityName}");
                 return RedirectToAction(nameof(Index));
             }
 
@@ -137,7 +137,7 @@ namespace challenges.Controllers
         {
             var activity = await _activityRepository.FindByIdAsync(id);
             await _activityRepository.DeleteAsync(activity);
-            await auditLogger.log(getUserId(), $"Deleted activity: {activity.ActivityId}");
+            await auditLogger.log(getUserId(), $"Deleted activity: {id}");
             return RedirectToAction(nameof(Index));
         }
 

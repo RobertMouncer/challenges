@@ -12,6 +12,7 @@ using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using YourApp.Services;
+using AberFitnessAuditLogger;
 
 namespace challenges.Controllers.api
 {
@@ -25,16 +26,18 @@ namespace challenges.Controllers.api
         private readonly IActivityRepository _activityRepository;
         private readonly IApiClient _client;
         private readonly IConfigurationSection _appConfig;
+        private readonly IAuditLogger auditLogger;
 
         public ChallengesController(IChallengeRepository challengeRepository, 
             IUserChallengeRepository userChallengeRepository, IActivityRepository activityRepository,
-            IApiClient client, IConfiguration config)
+            IApiClient client, IConfiguration config, IAuditLogger auditLogger)
         {
             _challengeRepository = challengeRepository;
             _userChallengeRepository = userChallengeRepository;
             _activityRepository = activityRepository;
             _client = client;
             _appConfig = config.GetSection("Challenges");
+            this.auditLogger = auditLogger;
         }
 
         [HttpPost]
@@ -55,7 +58,7 @@ namespace challenges.Controllers.api
             userChallenge.ChallengeId = challenge.ChallengeId;
 
             var user = await _userChallengeRepository.AddAsync(userChallenge);
-        
+            await auditLogger.log(userChallenge.UserId, $"Created Challenge via API");
             return Ok(user);
         }
 
@@ -107,6 +110,7 @@ namespace challenges.Controllers.api
 
             userChallenge.Challenge.Activity = null;
             await _userChallengeRepository.UpdateAsync(userChallenge);
+            await auditLogger.log(userChallenge.UserId, $"Updated Challenge via API");
 
             return Ok(userChallenge);
         }
@@ -120,6 +124,7 @@ namespace challenges.Controllers.api
 
             userChallenge.Challenge.Activity = null;
             await _challengeRepository.DeleteAsync(userChallenge.Challenge);
+            await auditLogger.log(userChallenge.UserId, $"Deleted Challenge via API");
             return Ok(userChallenge);
         }
 

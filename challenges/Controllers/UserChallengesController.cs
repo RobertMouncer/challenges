@@ -93,7 +93,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            await auditLogger.log(getUserId(), $"Accessed Delete User Challenge: {userChallenge.ChallengeId}");
+            await auditLogger.log(getUserId(), $"Accessed Delete User Challenge: {id}");
             return View(userChallenge);
         }
 
@@ -104,7 +104,7 @@ namespace challenges.Controllers
         {
             var userChallenge = await _userChallengeRepository.GetByIdAsync(id);
             await _userChallengeRepository.DeleteAsync(userChallenge);
-            await auditLogger.log(getUserId(), $"Deleted User Challenge: {userChallenge.ChallengeId}");
+            await auditLogger.log(getUserId(), $"Deleted User Challenge: {id}");
             return RedirectToAction(nameof(Index));
         }
 

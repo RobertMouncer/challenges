@@ -127,12 +127,12 @@ namespace challenges.Controllers
 
             if (ModelState.IsValid)
             {
-                
-                await _challengeRepository.AddAsync(challenge);
-                await auditLogger.log(getUserId(), $"Created Challenge: {challenge.ChallengeId}");
+
+                challenge = await _challengeRepository.AddAsync(challenge);
+                await auditLogger.log(getUserId(), $"Created Challenge");
                 if (!challenge.IsGroupChallenge)
                 {
-                    await _userChallengeRepository.AddAsync(user);
+                    user = await _userChallengeRepository.AddAsync(user);
                     await auditLogger.log(getUserId(), $"Created User Challenge: {user.UserChallengeId}");
                 }
 
@@ -174,7 +174,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            await auditLogger.log(getUserId(), $"Accessed Challenge: {challenge.ChallengeId}");
+            await auditLogger.log(getUserId(), $"Accessed Challenge: {id}");
 
             var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
@@ -227,11 +227,11 @@ namespace challenges.Controllers
                 try
                 {
                     
-                    await _challengeRepository.UpdateAsync(challenge);
+                    challenge = await _challengeRepository.UpdateAsync(challenge);
                     await auditLogger.log(getUserId(), $"Updated User Challenge: {challenge.ChallengeId}");
                     if (!challenge.IsGroupChallenge)
                     {
-                        await _userChallengeRepository.AddAsync(user);
+                        user = await _userChallengeRepository.AddAsync(user);
                         await auditLogger.log(getUserId(), $"Created User Challenge: {user.UserChallengeId}");
                     }
                     //await _context.SaveChangesAsync(); //TODO Tidy
@@ -273,7 +273,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            await auditLogger.log(getUserId(), $"Accessed Delete Challenge: {challenge.ChallengeId}");
+            await auditLogger.log(getUserId(), $"Accessed Delete Challenge: {id}");
             return View(challenge);
         }
 
@@ -285,7 +285,7 @@ namespace challenges.Controllers
             var challenge = await _challengeRepository.FindByIdAsync(id);
             await _challengeRepository.DeleteAsync(challenge);
 
-            await auditLogger.log(getUserId(), $"Deleted Challenge: {challenge.ChallengeId}");
+            await auditLogger.log(getUserId(), $"Deleted Challenge: {id}");
             return RedirectToAction(nameof(Index));
         }
 
@@ -307,7 +307,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            await auditLogger.log(getUserId(), $"Accessed Join Challenge: {challenge.ChallengeId}");
+            await auditLogger.log(getUserId(), $"Accessed Join Challenge: {id}");
             return View(challenge);
         }
 
@@ -338,7 +338,7 @@ namespace challenges.Controllers
             };
 
             await _userChallengeRepository.AddAsync(user);
-            await auditLogger.log(getUserId(), $"Joined challenge: {challenge.ChallengeId}");
+            await auditLogger.log(getUserId(), $"Joined challenge: {id}");
 
             return RedirectToAction(nameof(Index));
         }
