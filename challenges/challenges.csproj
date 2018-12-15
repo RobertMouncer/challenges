@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+
     <PackageReference Include="biz.aberfitness.auditlogger" Version="1.0.1" />
     <PackageReference Include="biz.aberfitness.layout" Version="2.6.20" />
     <PackageReference Include="Hangfire" Version="1.6.21" />
