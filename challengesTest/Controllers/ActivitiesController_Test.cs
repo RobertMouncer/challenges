@@ -23,7 +23,7 @@ namespace challengesTest.Controllers
         {
             activityRepository = new Mock<IActivityRepository>();
             var config = new ConfigurationBuilder().Build();
-            controller = new ActivitiesController(activityRepository.Object, _client, config, auditLogger.Object);
+            controller = new ActivitiesController(activityRepository.Object, _client, config, auditLogger);
 
         }
 
