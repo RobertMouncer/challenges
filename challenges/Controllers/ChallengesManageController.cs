@@ -133,7 +133,7 @@ namespace challenges.Controllers
                 if (!challenge.IsGroupChallenge)
                 {
                     user = await _userChallengeRepository.AddAsync(user);
-                    await auditLogger.log(getUserId(), $"Created User Challenge {user.UserId}");
+                    await auditLogger.log(getUserId(), $"Created User Challenge {user.UserChallengeId}");
                 }
 
                 if (challenge.IsGroupChallenge)
