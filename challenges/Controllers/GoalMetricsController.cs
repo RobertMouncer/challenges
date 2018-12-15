@@ -9,6 +9,7 @@ using challenges.Data;
 using challenges.Models;
 using Microsoft.AspNetCore.Authorization;
 using challenges.Repositories;
+using AberFitnessAuditLogger;
 
 namespace challenges.Controllers
 {
@@ -16,21 +17,24 @@ namespace challenges.Controllers
     public class GoalMetricsController : Controller
     {
         private readonly IGoalMetricRepository _GoalMetricRepository;
-
-        public GoalMetricsController(IGoalMetricRepository GoalMetricRepository)
+        private readonly IAuditLogger auditLogger;
+        public GoalMetricsController(IGoalMetricRepository GoalMetricRepository, IAuditLogger auditLogger)
         {
             _GoalMetricRepository = GoalMetricRepository;
+            this.auditLogger = auditLogger;
         }
 
         // GET: GoalMetrics
         public async Task<IActionResult> Index()
         {
+            await auditLogger.log(getUserId(), $"Accessed Goal Metric Index");
             return View(await _GoalMetricRepository.GetAllAsync());
         }
 
         // GET: GoalMetrics/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
+            await auditLogger.log(getUserId(), $"Accessed Goal Metric Create");
             return View();
         }
 
@@ -45,6 +49,7 @@ namespace challenges.Controllers
             if (ModelState.IsValid)
             {
                 await _GoalMetricRepository.AddAsync(goalMetric);
+                await auditLogger.log(getUserId(), $"Created Goal Metric: {goalMetric.GoalMetricId}");
                 return RedirectToAction(nameof(Index));
             }
             return View(goalMetric);
@@ -63,6 +68,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
+            await auditLogger.log(getUserId(), $"Accessed Edit Goal Metric: {goalMetric.GoalMetricId}");
             return View(goalMetric);
         }
 
@@ -83,7 +89,8 @@ namespace challenges.Controllers
                 try
                 {
                     await _GoalMetricRepository.UpdateAsync(goalMetric);
-                    
+                    await auditLogger.log(getUserId(), $"Updated Goal Metric: {goalMetric.GoalMetricId}");
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -114,7 +121,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-
+            await auditLogger.log(getUserId(), $"Accessed Delete Goal Metric: {goalMetric.GoalMetricId}");
             return View(goalMetric);
         }
 
@@ -125,7 +132,12 @@ namespace challenges.Controllers
         {
             var goalMetric = await _GoalMetricRepository.FindByIdAsync(id);
             await _GoalMetricRepository.DeleteAsync(goalMetric);
+            await auditLogger.log(getUserId(), $"Deleted goal metric: {goalMetric.GoalMetricId}");
             return RedirectToAction(nameof(Index));
+        }
+        private string getUserId()
+        {
+            return User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
         }
 
     }

@@ -10,7 +10,6 @@ namespace challenges.Repositories
     public class ActivityRepository : IActivityRepository
     {
         private readonly challengesContext _context;
-
         public ActivityRepository(challengesContext context)
         {
             _context = context;

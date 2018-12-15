@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using YourApp.Services;
 using Newtonsoft.Json;
+using AberFitnessAuditLogger;
 //Index page will be used to display group challenges that users can join. The create function will be used by the userChallenge to create a challenge for the user.
 namespace challenges.Controllers
 {
@@ -24,9 +25,11 @@ namespace challenges.Controllers
         private readonly IGoalMetricRepository _goalMetricRepository;
         private readonly IApiClient client;
         private readonly IConfigurationSection _appConfig;
+        private readonly IAuditLogger auditLogger;
 
         public ChallengesManageController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
-            IActivityRepository activityRepository, IGoalMetricRepository goalMetricRepository, IApiClient client, IConfiguration config)
+            IActivityRepository activityRepository, IGoalMetricRepository goalMetricRepository, IApiClient client, IConfiguration config,
+            IAuditLogger auditLogger)
         {
             _goalMetricRepository = goalMetricRepository;
             _userChallengeRepository = userChallengeRepository;
@@ -34,13 +37,14 @@ namespace challenges.Controllers
             _activityRepository = activityRepository;
             this.client = client;
             _appConfig = config.GetSection("Challenges");
-        }
+            this.auditLogger = auditLogger;
+    }
 
         
         // GET: Challenges
         public async Task<IActionResult> Index()
         {
-            
+            await auditLogger.log(getUserId(), $"Accessed challenge manage Index");
             if (isAdminOrCoord())
             {
                 var challengesContext = await _challengeRepository.GetAllGroup();
@@ -57,16 +61,22 @@ namespace challenges.Controllers
             }
             else
             {
-                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+                var userId = getUserId();
                 var groupResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups/ForUser/" + userId);
                 var group = groupResponse.Content.ReadAsStringAsync().Result;
                 dynamic data = JsonConvert.DeserializeObject(group);
                 string groupId;
+
                 if (data != null)
+                {
                     groupId = data.id;
+                }
                 else
+                {
                     groupId = "NOTHING";
-                 //TODO get user group and only display for that group
+                }
+                    
+                 
                  var challengesContext = _challengeRepository.GetAllByGroupId(groupId);
                 return View(await challengesContext);
             }
@@ -77,6 +87,7 @@ namespace challenges.Controllers
         // GET: Challenges/Create
         public async Task<IActionResult> Create()
         {
+            
             var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
             var items = GetGroups(groups);
@@ -85,6 +96,7 @@ namespace challenges.Controllers
             ViewData["GoalMetricId"] = new SelectList(await _goalMetricRepository.GetAllAsync(), "GoalMetricId", "GoalMetricDisplay");
             ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
+            await auditLogger.log(getUserId(), $"Accessed challenge manage Create");
             return View();
         }
 
@@ -95,7 +107,7 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+            var userId = getUserId();
 
             if (DateTime.Compare(challenge.StartDateTime.Date, DateTime.Now.Date) < 0)
             {
@@ -117,9 +129,11 @@ namespace challenges.Controllers
             {
                 
                 await _challengeRepository.AddAsync(challenge);
+                await auditLogger.log(getUserId(), $"Created Challenge: {challenge.ChallengeId}");
                 if (!challenge.IsGroupChallenge)
                 {
                     await _userChallengeRepository.AddAsync(user);
+                    await auditLogger.log(getUserId(), $"Created User Challenge: {user.UserChallengeId}");
                 }
 
                 if (challenge.IsGroupChallenge)
@@ -142,17 +156,25 @@ namespace challenges.Controllers
         // GET: Challenges/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-
+            
             if (id == null)
             {
                 return NotFound();
             }
 
-            var challenge = await _challengeRepository.FindByIdAsync((int) id);
+            var challenge = await _challengeRepository.FindByIdAsync((int)id);
+
+            var ownsChallenge = await OwnsChallenge(challenge.ChallengeId);
+
+            if ((!isAdminOrCoord() && challenge.IsGroupChallenge) ||(!isAdminOrCoord() && !ownsChallenge))
+            {
+                return NotFound();
+            }
             if (challenge == null)
             {
                 return NotFound();
             }
+            await auditLogger.log(getUserId(), $"Accessed Challenge: {challenge.ChallengeId}");
 
             var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
@@ -172,7 +194,7 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+            var userId = getUserId();
 
             UserChallenge user = new UserChallenge
             {
@@ -204,10 +226,13 @@ namespace challenges.Controllers
             {
                 try
                 {
+                    
                     await _challengeRepository.UpdateAsync(challenge);
+                    await auditLogger.log(getUserId(), $"Updated User Challenge: {challenge.ChallengeId}");
                     if (!challenge.IsGroupChallenge)
                     {
                         await _userChallengeRepository.AddAsync(user);
+                        await auditLogger.log(getUserId(), $"Created User Challenge: {user.UserChallengeId}");
                     }
                     //await _context.SaveChangesAsync(); //TODO Tidy
                 }
@@ -248,7 +273,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-
+            await auditLogger.log(getUserId(), $"Accessed Delete Challenge: {challenge.ChallengeId}");
             return View(challenge);
         }
 
@@ -259,6 +284,8 @@ namespace challenges.Controllers
         {
             var challenge = await _challengeRepository.FindByIdAsync(id);
             await _challengeRepository.DeleteAsync(challenge);
+
+            await auditLogger.log(getUserId(), $"Deleted Challenge: {challenge.ChallengeId}");
             return RedirectToAction(nameof(Index));
         }
 
@@ -280,7 +307,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-
+            await auditLogger.log(getUserId(), $"Accessed Join Challenge: {challenge.ChallengeId}");
             return View(challenge);
         }
 
@@ -290,7 +317,7 @@ namespace challenges.Controllers
         {
 
 
-            var userId = User.Claims.Single(c => c.Type == "sub").Value;
+            var userId = getUserId();
             var challenge = await _challengeRepository.FindByIdAsync(id);
             var userChallenge = await _userChallengeRepository.GetByCid_Uid(userId, id);
 
@@ -311,14 +338,12 @@ namespace challenges.Controllers
             };
 
             await _userChallengeRepository.AddAsync(user);
+            await auditLogger.log(getUserId(), $"Joined challenge: {challenge.ChallengeId}");
 
             return RedirectToAction(nameof(Index));
         }
 
-        public bool isAdminOrCoord()
-        {
-            return (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator"));
-        }
+        
 
         public IList<SelectListItem> GetGroups(string groups)
         {
@@ -334,6 +359,23 @@ namespace challenges.Controllers
                 items.Add(item);
             }
             return items;
+        }
+        public bool isAdminOrCoord()
+        {
+            return (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator"));
+        }
+
+        public async Task<bool> OwnsChallenge(int challengeId)
+        {
+            var ownedChallenges = await _userChallengeRepository.GetAllPersonalChallenges(getUserId());
+
+            return ownedChallenges.Any(c => c.ChallengeId == challengeId); ;
+
+        }
+
+        private string getUserId()
+        {
+            return User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
         }
     }
 }

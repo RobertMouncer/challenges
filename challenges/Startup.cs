@@ -17,6 +17,7 @@ using challenges.Repositories;
 using Hangfire;
 using Hangfire.MySql;
 using challenges.Controllers.shared;
+using AberFitnessAuditLogger;
 
 namespace challenges
 {
@@ -41,6 +42,7 @@ namespace challenges
             services.AddScoped<IChallengeRepository, ChallengeRepository>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
             services.AddScoped<IGoalMetricRepository, GoalMetricRepository>();
+            services.AddScoped<IAuditLogger, AuditLogger>();
 
             services.AddHttpClient();
             services.AddHttpClient("challengesHttpClient", client => {

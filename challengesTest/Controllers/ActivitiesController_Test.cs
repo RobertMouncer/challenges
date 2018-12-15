@@ -1,3 +1,4 @@
+using AberFitnessAuditLogger;
 using challenges.Controllers;
 using challenges.Models;
 using challenges.Repositories;
@@ -16,12 +17,14 @@ namespace challengesTest.Controllers
         private readonly Mock<IActivityRepository> activityRepository;
         private readonly ApiClient _client;
         private readonly ActivitiesController controller;
+        private readonly IAuditLogger auditLogger;
 
         public ActivitiesController_Test()
         {
             activityRepository = new Mock<IActivityRepository>();
             var config = new ConfigurationBuilder().Build();
-            controller = new ActivitiesController(activityRepository.Object, _client, config);
+            controller = new ActivitiesController(activityRepository.Object, _client, config, auditLogger.Object);
+
         }
 
         [Fact]

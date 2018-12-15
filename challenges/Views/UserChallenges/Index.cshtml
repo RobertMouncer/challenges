@@ -77,17 +77,18 @@
                                 @Html.DisplayFor(modelItem => item.Challenge.IsGroupChallenge)
                             </td>
                         }
-                        <td>
+                            <td>
 
-                            @if (item.Challenge.IsGroupChallenge)
-                            {
-                                <a asp-action="Delete" asp-route-id="@item.UserChallengeId" class="btn btn-warning btn-sm">Leave</a>
-                            }
-                            else
-                            {
+                                @if (item.Challenge.IsGroupChallenge)
+                                {
+                                    <a asp-action="Delete" asp-route-id="@item.UserChallengeId" class="btn btn-warning btn-sm">Leave</a>
+                                }
+                                else
+                                {
+                                <a asp-controller="ChallengesManage" asp-action="Edit" asp-route-id="@item.UserChallengeId"> Edit </a>
                                 <a asp-action="Delete" asp-route-id="@item.UserChallengeId" class="btn btn-danger btn-sm">Delete</a>
                             }
-                        </td>
+                                </td>
                     </tr>
                 }
             </tbody>
