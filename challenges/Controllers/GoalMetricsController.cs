@@ -49,7 +49,7 @@ namespace challenges.Controllers
             if (ModelState.IsValid)
             {
                 goalMetric = await _GoalMetricRepository.AddAsync(goalMetric);
-                await auditLogger.log(getUserId(), "Created Goal Metric");
+                await auditLogger.log(getUserId(), $"Created Goal Metric: {goalMetric.GoalMetricDisplay}");
                 return RedirectToAction(nameof(Index));
             }
             return View(goalMetric);
