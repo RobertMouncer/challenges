@@ -65,16 +65,15 @@ namespace challenges.Controllers.api
         [HttpGet("getGroup/{uid}")]
         public async Task<IActionResult> ListUserGroupChallenges([FromRoute] string uid)
         {
-            UpdatePercentage();
+            
             var userChallenges = await _userChallengeRepository.GetGroupByUid(uid);
-
+            
             if (userChallenges == null)
             {
                 return Ok(new List<object>());
             }
 
-
-            userChallenges = await _userChallengeRepository.GetGroupByUid(uid);
+            userChallenges = await UpdatePercentage(userChallenges);
 
             return Ok(userChallenges);
         }
@@ -82,7 +81,7 @@ namespace challenges.Controllers.api
         [HttpGet("getPersonal/{uid}")]
         public async Task<IActionResult> ListPersonalChallenges([FromRoute] string uid)
         {
-            UpdatePercentage();
+            
             var userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
 
             if (userChallenges == null){
@@ -90,7 +89,7 @@ namespace challenges.Controllers.api
                 return Ok(new List<object>());
             }
 
-            userChallenges = await _userChallengeRepository.GetAllPersonalChallenges(uid);
+            userChallenges = await UpdatePercentage(userChallenges);
 
             return Ok(userChallenges);
         }
@@ -143,10 +142,10 @@ namespace challenges.Controllers.api
                 ModelState.AddModelError("activityId", "Invalid Activity id received, activity doesn't exist.");
         }
 
-        public async void UpdatePercentage()
+        public async Task<List<UserChallenge>> UpdatePercentage(List<UserChallenge> userChallenges)
         {
             var SF = new SharedFunctionality(_userChallengeRepository, _client, _appConfig);
-            await SF.UpdateAllPercentageComplete();
+            return await SF.UpdatePercentageListAsync(userChallenges);
         }
     }
 }

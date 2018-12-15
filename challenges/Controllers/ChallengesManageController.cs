@@ -161,19 +161,26 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
+            var ownedChallenges = await _userChallengeRepository.GetAllPersonalChallenges(getUserId());
 
-            var challenge = await _challengeRepository.FindByIdAsync((int)id);
+            var uc1 = await _userChallengeRepository.GetByIdAsync((int)id);
+            var challenge = uc1.Challenge;
 
-            var ownsChallenge = await OwnsChallenge(challenge.ChallengeId);
 
-            if ((!isAdminOrCoord() && challenge.IsGroupChallenge) ||(!isAdminOrCoord() && !ownsChallenge))
-            {
-                return NotFound();
-            }
+            var uc = ownedChallenges.FirstOrDefault(c => c.Challenge.ChallengeId == challenge.ChallengeId);
+            
+            var owned = ownedChallenges.Any(c => c.ChallengeId == challenge.ChallengeId);
             if (challenge == null)
             {
                 return NotFound();
             }
+            
+
+            if ((!isAdminOrCoord() && challenge.IsGroupChallenge) ||(!isAdminOrCoord() && !owned))
+            {
+                return NotFound();
+            }
+            
             await auditLogger.log(getUserId(), $"Accessed Challenge: {id}");
 
             var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
@@ -369,7 +376,7 @@ namespace challenges.Controllers
         {
             var ownedChallenges = await _userChallengeRepository.GetAllPersonalChallenges(getUserId());
 
-            return ownedChallenges.Any(c => c.ChallengeId == challengeId); ;
+            return ownedChallenges.Any(c => c.ChallengeId == challengeId);
 
         }
 
