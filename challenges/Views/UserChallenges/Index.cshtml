@@ -5,7 +5,6 @@
     var userId = User.Claims.Single(c => c.Type == "sub").Value;
     var isAdminOrCoordinator = User.HasClaim("user_type", "administrator") || User.HasClaim("user_type", "coordinator");
 }
-
 <div class="card">
     <div class="card-header">
         <strong class="card-title">Personal Challenges</strong>
@@ -95,3 +94,4 @@
         </table>
     </div>
 </div>
+

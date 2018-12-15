@@ -149,7 +149,7 @@ namespace challenges
                     template: "{controller=UserChallenges}/{action=Index}/{id?}");
             });
 
-            RecurringJob.AddOrUpdate<SharedFunctionality>(x => x.UpdateAllPercentageComplete(), Cron.MinuteInterval(5));
+            RecurringJob.AddOrUpdate<SharedFunctionality>(x => x.UpdateAllPercentageComplete(), Cron.Minutely);
             RecurringJob.AddOrUpdate<SharedFunctionality>(x => x.SendEmail(), Cron.MinuteInterval(5));
         }
 
