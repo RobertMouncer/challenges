@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using YourApp.Services;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using AberFitnessAuditLogger;
 //display all user challenges.
 namespace challenges.Controllers
 {
@@ -23,23 +24,25 @@ namespace challenges.Controllers
         private readonly IChallengeRepository _challengeRepository;
         private readonly IApiClient client;
         private readonly IConfigurationSection _appConfig;
+        private readonly IAuditLogger auditLogger;
 
         public UserChallengesController(IUserChallengeRepository userChallengeRepository, IChallengeRepository challengeRepository, 
-            IApiClient client, IConfiguration config)
+            IApiClient client, IConfiguration config, IAuditLogger auditLogger)
         {
             _userChallengeRepository = userChallengeRepository;
             _challengeRepository = challengeRepository;
             this.client = client;
             _appConfig = config.GetSection("Challenges");
+            this.auditLogger = auditLogger;
         }
 
         // GET: UserChallenges
         public async Task<IActionResult> Index()
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+            var userId = getUserId();
 
 
-            //this if is awful, please change if you have another way, please do
+            await auditLogger.log(getUserId(), $"Accessed User Challenged Index");
             if (isAdminOrCoord())
             {
                 var challengesContext = await _userChallengeRepository.GetAllAsync();
@@ -90,7 +93,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-
+            await auditLogger.log(getUserId(), $"Accessed Delete User Challenge: {userChallenge.ChallengeId}");
             return View(userChallenge);
         }
 
@@ -101,6 +104,7 @@ namespace challenges.Controllers
         {
             var userChallenge = await _userChallengeRepository.GetByIdAsync(id);
             await _userChallengeRepository.DeleteAsync(userChallenge);
+            await auditLogger.log(getUserId(), $"Deleted User Challenge: {userChallenge.ChallengeId}");
             return RedirectToAction(nameof(Index));
         }
 
@@ -114,5 +118,9 @@ namespace challenges.Controllers
             return (User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("coordinator") || User.Claims.FirstOrDefault(c => c.Type == "user_type").Value.Equals("administrator"));
         }
 
+        private string getUserId()
+        {
+            return User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+        }
     }
 }

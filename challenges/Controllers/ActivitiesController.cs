@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using challenges.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using challenges.Models;
 using challenges.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using YourApp.Services;
 using Newtonsoft.Json;
-
+using AberFitnessAuditLogger;
+using System.Linq;
 
 //simply store info about an activity. Nice and easy.
 namespace challenges.Controllers
@@ -23,17 +20,20 @@ namespace challenges.Controllers
         private readonly IActivityRepository _activityRepository;
         private readonly IApiClient client;
         private readonly IConfigurationSection _appConfig;
+        private readonly IAuditLogger auditLogger;
 
-        public ActivitiesController(IActivityRepository activityRepository, IApiClient client, IConfiguration config)
+        public ActivitiesController(IActivityRepository activityRepository, IApiClient client, IConfiguration config, IAuditLogger auditLogger)
         {
             _activityRepository = activityRepository;
             this.client = client;
             _appConfig = config.GetSection("Challenges");
+            this.auditLogger = auditLogger;
         }
 
         // GET: Activities
         public async Task<IActionResult> Index()
         {
+            await auditLogger.log(getUserId(), $"Accessed Activity Index");
             return View(await _activityRepository.GetAllAsync());
         }
 
@@ -58,6 +58,7 @@ namespace challenges.Controllers
         // GET: Activities/Create
         public async Task<IActionResult> Create()
         {
+            await auditLogger.log(getUserId(), $"Accessed create activity.");
             var activities = await client.GetAsync(_appConfig.GetValue<string>("HealthDataRepositoryUrl") + "api/ActivityTypes");
             var activitiesContent = activities.Content.ReadAsStringAsync().Result;
             var items = GetActivities(activitiesContent);
@@ -86,6 +87,7 @@ namespace challenges.Controllers
             if (ModelState.IsValid)
             {
                 await _activityRepository.AddAsync(activity);
+                await auditLogger.log(getUserId(), $"Created activity: {activity.ActivityId}");
                 return RedirectToAction(nameof(Index));
             }
 
@@ -113,6 +115,7 @@ namespace challenges.Controllers
         // GET: Activities/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            await auditLogger.log(getUserId(), $"Accessed Delete activity: {id}");
             if (id == null)
             {
                 return NotFound();
@@ -134,6 +137,7 @@ namespace challenges.Controllers
         {
             var activity = await _activityRepository.FindByIdAsync(id);
             await _activityRepository.DeleteAsync(activity);
+            await auditLogger.log(getUserId(), $"Deleted activity: {activity.ActivityId}");
             return RedirectToAction(nameof(Index));
         }
 
@@ -145,6 +149,10 @@ namespace challenges.Controllers
         private bool ActivityNameExists(string name)
         {
             return _activityRepository.Exists(name);
+        }
+        private string getUserId()
+        {
+            return  User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
         }
 
     }

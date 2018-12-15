@@ -127,12 +127,11 @@ namespace challenges.Controllers.shared
                 emailContent.AppendLine("<p>Your goal was " + uc.Challenge.Goal + " " + uc.Challenge.GoalMetric.GoalMetricDbName + ".</p>");
                 emailContent.AppendLine("<p>The activity was " + uc.Challenge.Activity.ActivityName + ".</p>");
                 emailContent.AppendLine("<p>Between Dates " + uc.Challenge.StartDateTime + " and " + uc.Challenge.EndDateTime + ".</p>");
-                emailContent.AppendLine();
-
+                var content = "How are you?";
                 var payload = new
                 {
                     Subject = "Challenge " + outcome,
-                    Content = emailContent,
+                    Content = content,
                     UserId = uc.UserId
                 };
                 uc.EmailSent = true;

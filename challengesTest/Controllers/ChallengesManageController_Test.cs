@@ -1,3 +1,4 @@
+using AberFitnessAuditLogger;
 using challenges.Controllers;
 using challenges.Models;
 using challenges.Repositories;
@@ -19,6 +20,7 @@ namespace challengesTest.Controllers
         private readonly Mock<IGoalMetricRepository> _goalMetricRepository;
         private readonly IApiClient client;
         private readonly ChallengesManageController controller;
+        private readonly IAuditLogger auditLogger;
 
         public ChallengesManageController_Test()
         {
@@ -27,7 +29,7 @@ namespace challengesTest.Controllers
             _activityRepository = new Mock<IActivityRepository>();
             _goalMetricRepository = new Mock<IGoalMetricRepository>();
             var config = new ConfigurationBuilder().Build();
-            controller = new ChallengesManageController(_userChallengeRepository.Object, _challengeRepository.Object,_activityRepository.Object,_goalMetricRepository.Object, client, config);
+            controller = new ChallengesManageController(_userChallengeRepository.Object, _challengeRepository.Object,_activityRepository.Object,_goalMetricRepository.Object, client, config, auditLogger);
         }
 
         [Fact]
