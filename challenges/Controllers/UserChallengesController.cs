@@ -42,8 +42,7 @@ namespace challenges.Controllers
         {
             
             var SF = new SharedFunctionality(_userChallengeRepository, client, _appConfig);
-            await SF.UpdateAllPercentageComplete();
-            
+           
             var userId = getUserId();
 
 
@@ -51,7 +50,7 @@ namespace challenges.Controllers
             if (isAdminOrCoord())
             {
                 var challengesContext = await _userChallengeRepository.GetAllAsync();
-
+                challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
                 List<string> userList = new List<string>();
 
                 foreach (UserChallenge u in challengesContext)
@@ -78,7 +77,7 @@ namespace challenges.Controllers
             {
 
                 var challengesContext = await _userChallengeRepository.GetByUId(userId);
-
+                challengesContext = await SF.UpdatePercentageListAsync(challengesContext);
                 return View(challengesContext);
             }
             

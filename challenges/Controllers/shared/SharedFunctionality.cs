@@ -16,11 +16,11 @@ namespace challenges.Controllers.shared
         private  IApiClient apiClient;
         private  IConfigurationSection appConfig;
 
-        public SharedFunctionality(IUserChallengeRepository userChallengeRepository, IApiClient apiClient, IConfiguration appConfig)
+        public SharedFunctionality(IUserChallengeRepository userChallengeRepository, IApiClient apiClient, IConfigurationSection appConfig)
         {
             this.userChallengeRepository = userChallengeRepository;
             this.apiClient = apiClient;
-            this.appConfig = appConfig.GetSection("Challenges");
+            this.appConfig = appConfig;
         }
 
         public async Task<List<UserChallenge>> UpdatePercentageListAsync(List<UserChallenge> userChallenges)

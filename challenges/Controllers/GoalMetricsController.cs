@@ -32,7 +32,7 @@ namespace challenges.Controllers
         }
 
         // GET: GoalMetrics/Create
-        public async Task<IActionResult> CreateAsync()
+        public async Task<IActionResult> Create()
         {
             await auditLogger.log(getUserId(), "Accessed Goal Metric Create");
             return View();
