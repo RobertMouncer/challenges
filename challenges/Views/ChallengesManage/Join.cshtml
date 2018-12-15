@@ -1,0 +1,28 @@
+﻿@model challenges.Models.Challenge
+@{
+    ViewData["Title"] = "Join Challenge";
+}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <strong class="card-title">Join challenge</strong>
+            </div>
+            <div class="card-body">
+
+                <h5>Are you sure you want to join?</h5>
+                <hr />
+
+                <div>
+                    <form asp-action="Join">
+                        <input type="hidden" asp-for="ChallengeId" />
+                        <input type="submit" value="Join" class="btn btn-success" />
+                        <a asp-action="Index" class="btn btn-info">Back to List</a>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+

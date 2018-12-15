@@ -1,0 +1,374 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This API is used to perfrom CRUD operations from the Health Dashboard service for the challenges service.",
+    "version": "1.5.0",
+    "title": "Challenges",
+    "contact": {
+      "name": "Robert",
+      "email": "rdm10@aber.ac.uk"
+    }
+  },
+  "tags": [
+    {
+      "name": "Status",
+      "description": "Returns Status of microservice."
+    },
+    {
+      "name": "Activities",
+      "description": "CRUD operations for activities."
+    },
+    {
+      "name": "UserChallenges",
+      "description": "Challenges CRUD operations."
+    }
+  ],
+  "paths": {
+    "/api/status": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Check status of the microservice.",
+        "operationId": "checkStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation."
+          }
+        }
+      }
+    },
+    "/api/activities": {
+      "get": {
+        "tags": [
+          "Activities"
+        ],
+        "summary": "Returns list of available activites.",
+        "operationId": "getActivities",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Activity"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/challengesManage": {
+      "post": {
+        "tags": [
+          "UserChallenges"
+        ],
+        "summary": "Add a new challenge for a user.",
+        "operationId": "addChallenge",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "challengeObject",
+            "description": "challenge object to be added.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserChallenge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "$ref": "#/definitions/UserChallenge"
+            }
+          },
+          "405": {
+            "description": "Invalid input."
+          }
+        }
+      }
+    },
+    "/api/challengesManage/getGroup/{UID}": {
+      "get": {
+        "tags": [
+          "UserChallenges"
+        ],
+        "summary": "Get list of user challenges.",
+        "operationId": "getGroupChallenges",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "UID",
+            "in": "path",
+            "description": "UserId to retrieve group challenges for.",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserChallenge"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UGID supplied."
+          },
+          "404": {
+            "description": "UserGroup Challenges not found."
+          }
+        }
+      }
+    },
+    "/api/challengesManage/getPersonal/{UID}": {
+      "get": {
+        "tags": [
+          "UserChallenges"
+        ],
+        "summary": "Get list of a Users Personal Challenges",
+        "operationId": "getUserChallenges",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "UID",
+            "in": "path",
+            "description": "User ID to retrieve challenges for.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserChallenge"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UID supplied."
+          },
+          "404": {
+            "description": "User Challenges not found."
+          }
+        }
+      }
+    },
+    "/api/challengesManage/{ChallengeId}": {
+      "put": {
+        "tags": [
+          "UserChallenges"
+        ],
+        "summary": "Update an existing Challenge.",
+        "operationId": "updateChallenge",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "ChallengeId",
+            "in": "path",
+            "description": "ID of Challenge to update.",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "ChallengeObject",
+            "description": "Challenge object to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserChallenge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation."
+          },
+          "400": {
+            "description": "Invalid ID supplied."
+          },
+          "404": {
+            "description": "Challenge not found."
+          },
+          "405": {
+            "description": "Invalid input."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "UserChallenges"
+        ],
+        "summary": "Deletes a challenge.",
+        "operationId": "deleteChallenge",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "ChallengeId",
+            "in": "path",
+            "description": "ID of challenge to be deleted.",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation."
+          },
+          "400": {
+            "description": "Invalid ID supplied."
+          },
+          "404": {
+            "description": "Challenge not found."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Challenge": {
+      "type": "object",
+      "properties": {
+        "challengeId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "startDateTime": {
+          "type": "string",
+          "example": "2018/07/16 09:00:00"
+        },
+        "endDateTime": {
+          "type": "string",
+          "example": "2018/07/16 09:00:00"
+        },
+        "goal": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "GoalMetric": {
+          "$ref": "#/definitions/GoalMetric"
+        },
+        "GoalMetricId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "activityId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "activity": {
+          "$ref": "#/definitions/Activity"
+        },        
+        "isGroupChallenge": {
+          "type": "boolean"
+        },
+        "groupId": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Activity": {
+      "type": "object",
+      "required": [
+        "activityId",
+        "activityName"
+      ],
+      "properties": {
+        "activityId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "activityName": {
+          "type": "string",
+          "example": "Swimming"
+        },
+        "DbActivityId": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "UserChallenge": {
+      "type": "object",
+      "properties": {
+        "userChallengeId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "userId": {
+          "type": "string",
+          "example": "some-user-id"
+        },
+        "challengeId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "challenge": {
+          "$ref": "#/definitions/Challenge"
+        },
+        "percentageComplete": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "GoalMetric": {
+      "type": "object",
+      "properties": {
+        "GoalMetricId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "GoalMetricDisplay": {
+          "type": "string",
+          "example": "Steps Taken"
+        },
+        "GoalMetricDbName": {
+          "type": "string",
+          "example": "StepsTaken"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "GitHub Repository",
+    "url": "https://github.com/sem5640-2018/challenges"
+  }
+}
