@@ -33,7 +33,7 @@ namespace challenges.Controllers
         // GET: Activities
         public async Task<IActionResult> Index()
         {
-            await auditLogger.log(getUserId(), $"Accessed Activity Index");
+            await auditLogger.log(getUserId(), "Accessed Activity Index");
             return View(await _activityRepository.GetAllAsync());
         }
 
@@ -58,7 +58,7 @@ namespace challenges.Controllers
         // GET: Activities/Create
         public async Task<IActionResult> Create()
         {
-            await auditLogger.log(getUserId(), $"Accessed create activity.");
+            await auditLogger.log(getUserId(), "Accessed create activity.");
             var activities = await client.GetAsync(_appConfig.GetValue<string>("HealthDataRepositoryUrl") + "api/ActivityTypes");
             var activitiesContent = activities.Content.ReadAsStringAsync().Result;
             var items = GetActivities(activitiesContent);

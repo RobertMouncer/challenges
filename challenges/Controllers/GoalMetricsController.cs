@@ -27,14 +27,14 @@ namespace challenges.Controllers
         // GET: GoalMetrics
         public async Task<IActionResult> Index()
         {
-            await auditLogger.log(getUserId(), $"Accessed Goal Metric Index");
+            await auditLogger.log(getUserId(), "Accessed Goal Metric Index");
             return View(await _GoalMetricRepository.GetAllAsync());
         }
 
         // GET: GoalMetrics/Create
         public async Task<IActionResult> CreateAsync()
         {
-            await auditLogger.log(getUserId(), $"Accessed Goal Metric Create");
+            await auditLogger.log(getUserId(), "Accessed Goal Metric Create");
             return View();
         }
 
@@ -49,7 +49,7 @@ namespace challenges.Controllers
             if (ModelState.IsValid)
             {
                 goalMetric = await _GoalMetricRepository.AddAsync(goalMetric);
-                await auditLogger.log(getUserId(), $"Created Goal Metric");
+                await auditLogger.log(getUserId(), "Created Goal Metric");
                 return RedirectToAction(nameof(Index));
             }
             return View(goalMetric);

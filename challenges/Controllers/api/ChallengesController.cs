@@ -58,7 +58,7 @@ namespace challenges.Controllers.api
             userChallenge.ChallengeId = challenge.ChallengeId;
 
             var user = await _userChallengeRepository.AddAsync(userChallenge);
-            await auditLogger.log(userChallenge.UserId, $"Created Challenge via API");
+            await auditLogger.log(userChallenge.UserId, "Created Challenge via API");
             return Ok(user);
         }
 
@@ -124,7 +124,7 @@ namespace challenges.Controllers.api
 
             userChallenge.Challenge.Activity = null;
             await _challengeRepository.DeleteAsync(userChallenge.Challenge);
-            await auditLogger.log(userChallenge.UserId, $"Deleted Challenge via API");
+            await auditLogger.log(userChallenge.UserId, "Deleted Challenge via API");
             return Ok(userChallenge);
         }
 

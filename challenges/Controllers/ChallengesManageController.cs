@@ -44,7 +44,7 @@ namespace challenges.Controllers
         // GET: Challenges
         public async Task<IActionResult> Index()
         {
-            await auditLogger.log(getUserId(), $"Accessed challenge manage Index");
+            await auditLogger.log(getUserId(), "Accessed challenge manage Index");
             if (isAdminOrCoord())
             {
                 var challengesContext = await _challengeRepository.GetAllGroup();
@@ -96,7 +96,7 @@ namespace challenges.Controllers
             ViewData["GoalMetricId"] = new SelectList(await _goalMetricRepository.GetAllAsync(), "GoalMetricId", "GoalMetricDisplay");
             ViewData["ActivityId"] = new SelectList(_activityRepository.GetDBSet(), "ActivityId", "ActivityName");
             ViewData["Groupid"] = new SelectList(items, "Value", "Text");
-            await auditLogger.log(getUserId(), $"Accessed challenge manage Create");
+            await auditLogger.log(getUserId(), "Accessed challenge manage Create");
             return View();
         }
 
@@ -129,11 +129,11 @@ namespace challenges.Controllers
             {
 
                 challenge = await _challengeRepository.AddAsync(challenge);
-                await auditLogger.log(getUserId(), $"Created Challenge");
+                await auditLogger.log(getUserId(), "Created Challenge");
                 if (!challenge.IsGroupChallenge)
                 {
                     user = await _userChallengeRepository.AddAsync(user);
-                    await auditLogger.log(getUserId(), $"Created User Challenge: {user.UserChallengeId}");
+                    await auditLogger.log(getUserId(), "Created User Challenge");
                 }
 
                 if (challenge.IsGroupChallenge)
