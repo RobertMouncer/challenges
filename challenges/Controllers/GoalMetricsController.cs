@@ -48,8 +48,8 @@ namespace challenges.Controllers
             //TODO CHECK IT DOESN'T ALREADY EXIST
             if (ModelState.IsValid)
             {
-                await _GoalMetricRepository.AddAsync(goalMetric);
-                await auditLogger.log(getUserId(), $"Created Goal Metric: {goalMetric.GoalMetricId}");
+                goalMetric = await _GoalMetricRepository.AddAsync(goalMetric);
+                await auditLogger.log(getUserId(), $"Created Goal Metric");
                 return RedirectToAction(nameof(Index));
             }
             return View(goalMetric);
@@ -68,7 +68,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            await auditLogger.log(getUserId(), $"Accessed Edit Goal Metric: {goalMetric.GoalMetricId}");
+            await auditLogger.log(getUserId(), $"Accessed Edit Goal Metric: {id}");
             return View(goalMetric);
         }
 
@@ -88,7 +88,7 @@ namespace challenges.Controllers
             {
                 try
                 {
-                    await _GoalMetricRepository.UpdateAsync(goalMetric);
+                    goalMetric = await _GoalMetricRepository.UpdateAsync(goalMetric);
                     await auditLogger.log(getUserId(), $"Updated Goal Metric: {goalMetric.GoalMetricId}");
 
                 }
@@ -121,7 +121,7 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            await auditLogger.log(getUserId(), $"Accessed Delete Goal Metric: {goalMetric.GoalMetricId}");
+            await auditLogger.log(getUserId(), $"Accessed Delete Goal Metric: {id}");
             return View(goalMetric);
         }
 
@@ -132,7 +132,7 @@ namespace challenges.Controllers
         {
             var goalMetric = await _GoalMetricRepository.FindByIdAsync(id);
             await _GoalMetricRepository.DeleteAsync(goalMetric);
-            await auditLogger.log(getUserId(), $"Deleted goal metric: {goalMetric.GoalMetricId}");
+            await auditLogger.log(getUserId(), $"Deleted goal metric: {id}");
             return RedirectToAction(nameof(Index));
         }
         private string getUserId()
