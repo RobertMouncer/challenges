@@ -14,6 +14,7 @@ using YourApp.Services;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using AberFitnessAuditLogger;
+using challenges.Controllers.shared;
 //display all user challenges.
 namespace challenges.Controllers
 {
@@ -39,6 +40,10 @@ namespace challenges.Controllers
         // GET: UserChallenges
         public async Task<IActionResult> Index()
         {
+            
+            var SF = new SharedFunctionality(_userChallengeRepository, client, _appConfig);
+            await SF.UpdateAllPercentageComplete();
+            
             var userId = getUserId();
 
 
