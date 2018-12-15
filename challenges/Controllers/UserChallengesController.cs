@@ -42,7 +42,7 @@ namespace challenges.Controllers
             var userId = getUserId();
 
 
-            await auditLogger.log(getUserId(), $"Accessed User Challenged Index");
+            await auditLogger.log(getUserId(), "Accessed User Challenged Index");
             if (isAdminOrCoord())
             {
                 var challengesContext = await _userChallengeRepository.GetAllAsync();

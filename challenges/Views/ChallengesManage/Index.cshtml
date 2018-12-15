@@ -19,6 +19,9 @@
             <thead>
                 <tr>
                     <th>
+                        @Html.DisplayNameFor(model => model.Activity)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.StartDateTime)
                     </th>
                     <th>
@@ -30,9 +33,7 @@
                     <th>
                         @Html.DisplayNameFor(model => model.GoalMetric.GoalMetricDisplay)
                     </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Activity)
-                    </th>
+
                     @if (isAdminOrCoordinator)
                     {
                         <th>
@@ -45,41 +46,40 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Activity.ActivityName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Goal)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GoalMetric.GoalMetricDisplay)
+                    </td>
+                    @if (isAdminOrCoordinator)
+                    {
                         <td>
-                            @Html.DisplayFor(modelItem => item.StartDateTime)
+                            @Html.DisplayFor(modelItem => item.Groupid)
                         </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.EndDateTime)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Goal)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.GoalMetric.GoalMetricDisplay)
-                        </td>
-                       
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Activity.ActivityName)
-                        </td>
+                    }
+                    <td>
                         @if (isAdminOrCoordinator)
                         {
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Groupid)
-                            </td>
+                            <a asp-action="Edit" asp-route-id="@item.ChallengeId" class="btn btn-info">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.ChallengeId" class="btn btn-danger">Delete</a>
                         }
-                        <td>
-                            @if (isAdminOrCoordinator)
-                            {
-                                <a asp-action="Edit" asp-route-id="@item.ChallengeId" class="btn btn-info">Edit</a>                               
-                                <a asp-action="Delete" asp-route-id="@item.ChallengeId" class="btn btn-danger">Delete</a>
-                            }
-                            else
-                            {
-                                <a asp-action="Join" asp-route-id="@item.ChallengeId">Join</a>
-                            }
-                        </td>
-                    </tr>
+                        else
+                        {
+                            <a asp-action="Join" asp-route-id="@item.ChallengeId">Join</a>
+                        }
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>
