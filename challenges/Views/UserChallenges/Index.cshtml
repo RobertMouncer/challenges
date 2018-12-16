@@ -7,8 +7,16 @@
 }
 <div class="card">
     <div class="card-header">
-        <strong class="card-title">Personal Challenges</strong>
-            <a asp-controller="ChallengesManage" asp-action="Create" class="btn btn-success btn-sm">Create Personal Challenge</a>
+        @if (isAdminOrCoordinator)
+        {
+            <strong class="card-title">User Challenges</strong>
+        }
+        else
+        {
+            <strong class="card-title">Your Challenges</strong>
+        }
+
+        <a asp-controller="ChallengesManage" asp-action="Create" class="btn btn-success btn-sm">Create Personal Challenge</a>
     </div>
     <div class="table-stats order-table ov-h">
         <table class="table">
@@ -84,7 +92,7 @@
                                 }
                                 else
                                 {
-                                <a asp-controller="ChallengesManage" asp-action="Edit" asp-route-id="@item.UserChallengeId" class="btn btn-info btn-sm"> Edit </a>
+                                <a asp-controller="ChallengesManage" asp-action="Edit" asp-route-id="@item.Challenge.ChallengeId" class="btn btn-info btn-sm"> Edit </a>
                                 <a asp-action="Delete" asp-route-id="@item.UserChallengeId" class="btn btn-danger btn-sm">Delete</a>
                             }
                                 </td>

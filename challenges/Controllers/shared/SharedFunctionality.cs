@@ -34,13 +34,7 @@ namespace challenges.Controllers.shared
                 var challengeEndDate = c.Challenge.EndDateTime;
                 var dateSelected = todayDate;
 
-                if(DateTime.Compare(challengeEndDate, todayDate) <= 0)
-                {
-                    dateSelected = challengeEndDate;
-                }
-
-
-                if (DateTime.Compare(challengeStartDate, todayDate) <= 0)
+                if (DateTime.Compare(challengeStartDate, todayDate) <= 0 && DateTime.Compare(challengeEndDate, todayDate) > 0)
                 {
                     var userData = await apiClient.GetAsync(appConfig.GetValue<string>("HealthDataRepositoryUrl") + "api/Activities/ByUser/"
                                                           + c.UserId + "?from=" + challengeStartDate.ToString("yyyy-MM-dd") + "&to=" + dateSelected.Date.ToString("yyyy-MM-dd"));
