@@ -161,20 +161,15 @@ namespace challenges.Controllers
             {
                 return NotFound();
             }
-            var ownedChallenges = await _userChallengeRepository.GetAllPersonalChallenges(getUserId());
 
-            var uc1 = await _userChallengeRepository.GetByIdAsync((int)id);
-            var challenge = uc1.Challenge;
-
-
-            var uc = ownedChallenges.FirstOrDefault(c => c.Challenge.ChallengeId == challenge.ChallengeId);
-            
-            var owned = ownedChallenges.Any(c => c.ChallengeId == challenge.ChallengeId);
+            var challenge = await _challengeRepository.FindByIdAsync((int)id);
             if (challenge == null)
             {
                 return NotFound();
             }
-            
+
+            var ownedChallenges = await _userChallengeRepository.GetAllPersonalChallenges(getUserId());
+            var owned = ownedChallenges.Any(c => c.Challenge.ChallengeId == challenge.ChallengeId);
 
             if ((!isAdminOrCoord() && challenge.IsGroupChallenge) ||(!isAdminOrCoord() && !owned))
             {
@@ -201,14 +196,6 @@ namespace challenges.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ChallengeId,StartDateTime,EndDateTime,Goal,GoalMetricId,ActivityId,IsGroupChallenge,Groupid")] Challenge challenge)
         {
-            var userId = getUserId();
-
-            UserChallenge user = new UserChallenge
-            {
-                UserId = userId,
-                Challenge = challenge,
-                ChallengeId = challenge.ChallengeId
-            };
 
             if (DateTime.Compare(challenge.StartDateTime, DateTime.Now) <= 0)
             {
@@ -217,11 +204,6 @@ namespace challenges.Controllers
             if (DateTime.Compare(challenge.EndDateTime, challenge.StartDateTime) <= 0)
             {
                 ModelState.AddModelError("EndDateTime", "End Date/Time should be after the start Date/Time. Please re-enter Date/Time.");
-            }
-
-            if (isAdminOrCoord() && !challenge.IsGroupChallenge)
-            {
-                ModelState.AddModelError("IsGroupChallenge", "Must be a group challenge");
             }
 
             if (id != challenge.ChallengeId)
@@ -236,11 +218,6 @@ namespace challenges.Controllers
                     
                     challenge = await _challengeRepository.UpdateAsync(challenge);
                     await auditLogger.log(getUserId(), $"Updated User Challenge: {challenge.ChallengeId}");
-                    if (!challenge.IsGroupChallenge)
-                    {
-                        user = await _userChallengeRepository.AddAsync(user);
-                        await auditLogger.log(getUserId(), $"Created User Challenge: {user.UserChallengeId}");
-                    }
                     //await _context.SaveChangesAsync(); //TODO Tidy
                 }
                 catch (DbUpdateConcurrencyException)
@@ -254,7 +231,11 @@ namespace challenges.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                if (challenge.IsGroupChallenge)
+                {
+                    return RedirectToAction("Index", "ChallengesManage");
+                }
+                return RedirectToAction("Index", "UserChallenges");
             }
             var groupsResponse = await client.GetAsync(_appConfig.GetValue<string>("UserGroupsUrl") + "api/groups");
             var groups = groupsResponse.Content.ReadAsStringAsync().Result;
